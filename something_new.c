@@ -24,10 +24,10 @@ int main(void)
     //Font pref = LoadFontEx("");
     InitWindow(screenWidth, screenHeight, "raylib [text] example - input box");
     Font pref = LoadFontEx("all-stuff2/Terminus.ttf", TEXT_SIZE, NULL, 0);
-    printf("baseSize = %d\n", pref.baseSize);
-    printf("glyphCount = %d\n", pref.glyphCount);
-    printf("texture.id = %u\n", pref.texture.id);
-    char name[MAX_ROWS][MAX_INPUT_CHARS + 1] = {0};
+    //printf("baseSize = %d\n", pref.baseSize);
+    //printf("glyphCount = %d\n", pref.glyphCount);
+    //printf("texture.id = %u\n", pref.texture.id);
+    char name[MAX_ROWS][MAX_INPUT_CHARS] = {0};
     // NOTE: One extra space required for null terminator char '\0'
     
     /*for (int i = 0; i < MAX_ROWS; i++) {
@@ -133,8 +133,10 @@ int main(void)
                 if ((letterCount[rowCount] < MAX_INPUT_CHARS) && (rowCount < MAX_ROWS))
                 {
                     // Draw blinking underscore char
-                float x = MeasureTextEx(pref, name[rowCount], TEXT_SIZE, TEXT_SPACING).x;
-                    if (((framesCounter / 20) % 2) == 0) DrawTextEx(pref, "_", (Vector2) {(int)textBox.x + 5 + x, (int)textBox.y + 12 + (LINE_GAP * rowCount)}, TEXT_SIZE, TEXT_SPACING, BLACK);
+                    float cursorWidth = (MeasureTextEx(pref, name[rowCount], TEXT_SIZE, TEXT_SPACING).x) / letterCount[rowCount];
+                    //fprintf(stdout, "%f\n", cursorWidth);
+                    float x = MeasureTextEx(pref, name[rowCount], TEXT_SIZE, TEXT_SPACING).x;
+                    if (((framesCounter / 20) % 2) == 0) DrawTextEx(pref, "_", (Vector2) {(int)textBox.x + 5 + ((float)TEXT_SIZE / 2) * (letterCount[rowCount]), (int)textBox.y + 12 + (LINE_GAP * rowCount)}, TEXT_SIZE, TEXT_SPACING, BLACK);
                 }
                 else DrawText("Press BACKSPACE to delete chars...", 2, 440, 20, GRAY);
             }
