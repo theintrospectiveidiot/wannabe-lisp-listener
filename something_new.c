@@ -1,7 +1,15 @@
 #include <raylib.h>
+#include <stdio.h>
 
-#define MAX_INPUT_CHARS     50
+#define MAX_INPUT_CHARS     100
 #define MAX_ROWS            10
+
+#define TEXT_SIZE           20
+#define LINE_GAP            (TEXT_SIZE + 2)
+#define TEXT_SPACING        0.00f
+
+#define MY_COL_ONE          CLITERAL(Color){ 201, 195, 131, 245 }
+#define MY_COL_TWO          CLITERAL(Color){ 190, 185, 161, 145 }
 
 //------------------------------------------------------------------------------------
 // Program main entry point
@@ -12,9 +20,13 @@ int main(void)
     //--------------------------------------------------------------------------------------
     const int screenWidth = 800;
     const int screenHeight = 500;
-
+    
+    //Font pref = LoadFontEx("");
     InitWindow(screenWidth, screenHeight, "raylib [text] example - input box");
-
+    Font pref = LoadFontEx("all-stuff2/Terminus.ttf", TEXT_SIZE, NULL, 0);
+    printf("baseSize = %d\n", pref.baseSize);
+    printf("glyphCount = %d\n", pref.glyphCount);
+    printf("texture.id = %u\n", pref.texture.id);
     char name[MAX_ROWS][MAX_INPUT_CHARS + 1] = {0};
     // NOTE: One extra space required for null terminator char '\0'
     
@@ -100,17 +112,17 @@ int main(void)
         //----------------------------------------------------------------------------------
         BeginDrawing();
 
-            ClearBackground(RAYWHITE);
+            ClearBackground(MY_COL_TWO);
 
             DrawText("PLACE MOUSE OVER INPUT BOX!", 2, 5, 20, GRAY);
 
-            DrawRectangleRec(textBox, LIGHTGRAY);
+            DrawRectangleRec(textBox, MY_COL_ONE);
             if (mouseOnText) DrawRectangleLines((int)textBox.x, (int)textBox.y, (int)textBox.width, (int)textBox.height, RED);
             else DrawRectangleLines((int)textBox.x, (int)textBox.y, (int)textBox.width, (int)textBox.height, DARKGRAY);
 
             for (int i = 0; i <= MAX_ROWS; i++) {
                 
-                DrawText(name[i], (int)textBox.x + 5, (int)textBox.y + 8 + (37 * i), 35, MAROON);
+                DrawTextEx(pref, name[i], (Vector2) {(int)textBox.x + 5, (int)textBox.y + 8 + (LINE_GAP * i)}, TEXT_SIZE, TEXT_SPACING, BLACK);
             }
 
 
@@ -121,7 +133,8 @@ int main(void)
                 if ((letterCount[rowCount] < MAX_INPUT_CHARS) && (rowCount < MAX_ROWS))
                 {
                     // Draw blinking underscore char
-                    if (((framesCounter/20)%2) == 0) DrawText("_", (int)textBox.x + 8 + MeasureText(name[rowCount], 35), (int)textBox.y + 12 + (37 * rowCount), 35, MAROON);
+                float x = MeasureTextEx(pref, name[rowCount], TEXT_SIZE, TEXT_SPACING).x;
+                    if (((framesCounter / 20) % 2) == 0) DrawTextEx(pref, "_", (Vector2) {(int)textBox.x + 5 + x, (int)textBox.y + 12 + (LINE_GAP * rowCount)}, TEXT_SIZE, TEXT_SPACING, BLACK);
                 }
                 else DrawText("Press BACKSPACE to delete chars...", 2, 440, 20, GRAY);
             }
