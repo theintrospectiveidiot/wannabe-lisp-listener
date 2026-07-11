@@ -1,6 +1,6 @@
 #include <raylib.h>
 
-#define MAX_INPUT_CHARS     100
+#define MAX_INPUT_CHARS     50
 #define MAX_ROWS            10
 
 //------------------------------------------------------------------------------------
