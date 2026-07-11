@@ -39,7 +39,7 @@ int main(void)
     int rowCount = 0;
 
     Rectangle textBox = { 2, 40, 796, 380 };
-    bool mouseOnText = false;
+    bool mouseOnText = true;
 
     int framesCounter = 0;
 
@@ -51,8 +51,8 @@ int main(void)
     {
         // Update
         //----------------------------------------------------------------------------------
-        if (CheckCollisionPointRec(GetMousePosition(), textBox)) mouseOnText = true;
-        else mouseOnText = false;
+        //if (CheckCollisionPointRec(GetMousePosition(), textBox)) mouseOnText = true;
+       // mouseOnText = false;
 
         if (mouseOnText)
         {
@@ -104,8 +104,8 @@ int main(void)
         }
         else SetMouseCursor(MOUSE_CURSOR_DEFAULT);
 
-        if (mouseOnText) framesCounter++;
-        else framesCounter = 0;
+        framesCounter++;
+        //else framesCounter = 0;
         //----------------------------------------------------------------------------------
 
         // Draw
