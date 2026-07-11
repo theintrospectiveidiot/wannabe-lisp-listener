@@ -44,15 +44,9 @@ int main(void)
     int framesCounter = 0;
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
-    //--------------------------------------------------------------------------------------
 
-    // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
-        // Update
-        //----------------------------------------------------------------------------------
-        //if (CheckCollisionPointRec(GetMousePosition(), textBox)) mouseOnText = true;
-       // mouseOnText = false;
 
         if (mouseOnText)
         {
@@ -62,7 +56,6 @@ int main(void)
             // Get char pressed (unicode character) on the queue
             int key = GetCharPressed();
 
-            // Check if more characters have been pressed on the same frame
             while (key > 0)
             {
                 // NOTE: Only allow keys in range [32..125]
