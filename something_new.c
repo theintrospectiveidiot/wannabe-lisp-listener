@@ -90,11 +90,13 @@ int main(void)
                     }
                 }
 
-                if (IsKeyPressed(KEY_LEFT)) {
-                    fprintf(stderr, "Bonjour! je suis LEFT!\n");
-                }
-                
+                                
                 name[rowCount][letterCount[rowCount]] = '\0';
+            }
+            
+            if (IsKeyPressed(KEY_LEFT)) {
+                    fprintf(stderr, "Bonjour! je suis LEFT!\n");
+                
             }
 
             if (IsKeyPressed(KEY_ENTER))
