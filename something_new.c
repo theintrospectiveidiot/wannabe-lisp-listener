@@ -11,6 +11,8 @@
 #define MY_COL_ONE          CLITERAL(Color){ 201, 195, 131, 245 }
 #define MY_COL_TWO          CLITERAL(Color){ 190, 185, 161, 145 }
 
+int mult_fact;
+
 //------------------------------------------------------------------------------------
 // Program main entry point
 //------------------------------------------------------------------------------------
@@ -21,9 +23,9 @@ int main(void)
     const int screenWidth = 800;
     const int screenHeight = 500;
     
-    //Font pref = LoadFontEx("");
+    mult_fact = 1;
     InitWindow(screenWidth, screenHeight, "raylib [text] example - input box");
-    Font pref = LoadFontEx("all-stuff2/Terminus.ttf", TEXT_SIZE, NULL, 0);
+    Font pref = LoadFontEx("all-stuff2/Terminus.ttf", (mult_fact * TEXT_SIZE), NULL, 0);
     //printf("baseSize = %d\n", pref.baseSize);
     //printf("glyphCount = %d\n", pref.glyphCount);
     //printf("texture.id = %u\n", pref.texture.id);
@@ -33,12 +35,13 @@ int main(void)
     /*for (int i = 0; i < MAX_ROWS; i++) {
         name[i][MAX_INPUT_CHARS + 1] = '\0';
     }*/
+    
 
     int line_data[MAX_ROWS] = {0};
     int letterCount[MAX_ROWS] = {0};
     int rowCount = 0;
 
-    Rectangle textBox = { 2, 40, 796, 380 };
+    Rectangle textBox = { 0, 40, 800, 380 };
     bool mouseOnText = true;
 
     int framesCounter = 0;
@@ -86,6 +89,10 @@ int main(void)
                         rowCount = 0;
                     }
                 }
+
+                if (IsKeyPressed(KEY_LEFT)) {
+                    fprintf(stderr, "Bonjour! je suis LEFT!\n");
+                }
                 
                 name[rowCount][letterCount[rowCount]] = '\0';
             }
@@ -115,7 +122,7 @@ int main(void)
 
             for (int i = 0; i <= MAX_ROWS; i++) {
                 
-                DrawTextEx(pref, name[i], (Vector2) {(int)textBox.x + 5, (int)textBox.y + 8 + (LINE_GAP * i)}, TEXT_SIZE, TEXT_SPACING, BLACK);
+                DrawTextEx(pref, name[i], (Vector2) {(int)textBox.x + 5, (int)textBox.y + 8 + (LINE_GAP * i)}, (mult_fact * TEXT_SIZE), TEXT_SPACING, BLACK);
             }
 
 
@@ -126,10 +133,10 @@ int main(void)
                 if ((letterCount[rowCount] < MAX_INPUT_CHARS) && (rowCount < MAX_ROWS))
                 {
                     // Draw blinking underscore char
-                    float cursorWidth = (MeasureTextEx(pref, name[rowCount], TEXT_SIZE, TEXT_SPACING).x) / letterCount[rowCount];
+                    float cursorWidth = (MeasureTextEx(pref, name[rowCount], (mult_fact * TEXT_SIZE), TEXT_SPACING).x) / letterCount[rowCount];
                     //fprintf(stdout, "%f\n", cursorWidth);
-                    float x = MeasureTextEx(pref, name[rowCount], TEXT_SIZE, TEXT_SPACING).x;
-                    if (((framesCounter / 20) % 2) == 0) DrawTextEx(pref, "_", (Vector2) {(int)textBox.x + 5 + ((float)TEXT_SIZE / 2) * (letterCount[rowCount]), (int)textBox.y + 12 + (LINE_GAP * rowCount)}, TEXT_SIZE, TEXT_SPACING, BLACK);
+                    float x = MeasureTextEx(pref, name[rowCount], (mult_fact * TEXT_SIZE), TEXT_SPACING).x;
+                    if (((framesCounter / 20) % 2) == 0) DrawTextEx(pref, "_", (Vector2) {(int)textBox.x + 5 + ((float)(mult_fact * TEXT_SIZE) / 2) * (letterCount[rowCount]), (int)textBox.y + 12 + (LINE_GAP * rowCount)}, (mult_fact * TEXT_SIZE), TEXT_SPACING, BLACK);
                 }
                 else DrawText("Press BACKSPACE to delete chars...", 2, 440, 20, GRAY);
             }
