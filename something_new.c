@@ -1,5 +1,6 @@
 #include <raylib.h>
 #include <stdio.h>
+#include <string.h>
 
 #define MAX_INPUT_CHARS     100
 #define MAX_ROWS            10
@@ -36,10 +37,14 @@ int main(void)
         name[i][MAX_INPUT_CHARS + 1] = '\0';
     }*/
     
-
-    int line_data[MAX_ROWS] = {0};
+    
+    int cur_pos[MAX_ROWS]     = {0};
     int letterCount[MAX_ROWS] = {0};
-    int rowCount = 0;
+    int rowCount              =  0;
+    
+    int mode = 0; 
+    // 0 when the cur_pos and letterCount + 1 are same.
+    // 1 when the cur_pos and letterCount + 1 are NOT same.
 
     Rectangle textBox = { 0, 40, 800, 380 };
     bool mouseOnText = true;
@@ -50,6 +55,10 @@ int main(void)
 
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
+        
+        if (mode == 0) {
+            cur_pos[rowCount] = letterCount[rowCount];
+        }
 
         if (mouseOnText)
         {
@@ -62,11 +71,29 @@ int main(void)
             while (key > 0)
             {
                 // NOTE: Only allow keys in range [32..125]
-                if ((((key >= 32) && (key <= 125)) || (key == 10) || (key == 9)) && (letterCount[rowCount] < MAX_INPUT_CHARS))
+                if (((key >= 32) && (key <= 125)) && (letterCount[rowCount] < MAX_INPUT_CHARS))
                 {
-                    name[rowCount][letterCount[rowCount]] = (char)key;
-                    name[rowCount][letterCount[rowCount] + 1] = '\0'; // Add null terminator at the end of the string
-                    letterCount[rowCount]++;
+                    //at the last position
+                    if (mode == 0)
+                    {
+                        name[rowCount][letterCount[rowCount]] = (char) key;
+                        name[rowCount][letterCount[rowCount] + 1] = '\0'; // Add null terminator at the end of the string
+                        letterCount[rowCount]++;
+                    }
+                    
+                    //letterCount[rowCount] is always at the null terminator. 
+
+                    //not at the last position
+                    else if (mode == 1) {
+                        char temp[letterCount[rowCount] + 1 - cur_pos[rowCount]];
+                        memcpy(temp, name[rowCount] + cur_pos[rowCount], letterCount[rowCount] + 1 - cur_pos[rowCount]);
+                        name[rowCount][cur_pos[rowCount]] = (char) key;
+                        cur_pos[rowCount]++;   
+                        //abcd0
+                        //01234
+                        memcpy(name[rowCount] + cur_pos[rowCount], temp, letterCount[rowCount] + 2 - cur_pos[rowCount]);
+                        letterCount[rowCount]++;
+                    }
                 }
 
                 key = GetCharPressed();  // Check next character in the queue
@@ -74,29 +101,90 @@ int main(void)
 
             if (IsKeyPressed(KEY_BACKSPACE))
             {
-                if (letterCount[rowCount] > 0) {
-                    letterCount[rowCount]--;
-                }
+                
+                if (mode == 0) {
+                    if (letterCount[rowCount] > 0) {
+                        letterCount[rowCount]--;
+                    }
 
                 
-                else if (letterCount[rowCount] == 0) {
+                    else if (letterCount[rowCount] == 0) {
                     
-                    if (rowCount > 0) {
-                    rowCount -= 1;
-                    }
+                        if (rowCount > 0) {
+                        rowCount -= 1;
+                        }
 
-                    else if (rowCount <= 0) {
-                        rowCount = 0;
+                        else if (rowCount <= 0) {
+                            rowCount = 0;
+                        }
+            
                     }
-                }
 
                                 
                 name[rowCount][letterCount[rowCount]] = '\0';
-            }
+                }
+                
+                else if (mode == 1) {
+                    if (cur_pos[rowCount] > 0) {
+                        char temp[letterCount[rowCount] + 1 - cur_pos[rowCount]];
+                        memcpy(temp, name[rowCount] + cur_pos[rowCount], letterCount[rowCount] + 1 - cur_pos[rowCount]);
+                        cur_pos[rowCount]--;   
+                        //abd0
+                        //0123
+                        memcpy(name[rowCount] + cur_pos[rowCount], temp, letterCount[rowCount] - cur_pos[rowCount]);
+                        letterCount[rowCount]--;
+
+                    }
+                }
+
+           }
             
             if (IsKeyPressed(KEY_LEFT)) {
-                    fprintf(stderr, "Bonjour! je suis LEFT!\n");
+                fprintf(stderr, "Bonjour! je suis LEFT!\n");
                 
+                if (mode == 0) {
+                    
+                    fprintf(stderr, "Bonjour! je suis LEFT et mode est 0!\n");
+
+                    if (letterCount[rowCount] <= 0) {
+                        cur_pos[rowCount] = 0;
+                    }
+                    else {
+                        cur_pos[rowCount] = letterCount[rowCount] - 1;
+                        
+                        fprintf(stderr, "Bonjour! je suis LEFT et mode est 0! est cur_pos has been updated to %d\n", cur_pos[rowCount]);   
+                        mode = 1;
+                    }
+                }
+            
+
+                else if (mode == 1) {
+                    if (cur_pos[rowCount] <= 0) {
+                        cur_pos[rowCount] = 0;
+                        mode = 0;
+                    }
+                    
+                    else {
+                        cur_pos[rowCount]--;
+                    }
+                }
+            }
+
+            if (IsKeyPressed(KEY_RIGHT)) {
+                if (mode == 0) {
+                    //area we havent explored yet
+                    cur_pos[rowCount] = letterCount[rowCount];
+                }
+
+                else if (mode == 1) {
+                    cur_pos[rowCount]++;
+                    
+                    if (letterCount[rowCount] == cur_pos[rowCount]) {
+                        mode = 0;
+                    }
+
+
+                }
             }
 
             if (IsKeyPressed(KEY_ENTER))
@@ -138,7 +226,7 @@ int main(void)
                     float cursorWidth = (MeasureTextEx(pref, name[rowCount], (mult_fact * TEXT_SIZE), TEXT_SPACING).x) / letterCount[rowCount];
                     //fprintf(stdout, "%f\n", cursorWidth);
                     float x = MeasureTextEx(pref, name[rowCount], (mult_fact * TEXT_SIZE), TEXT_SPACING).x;
-                    if (((framesCounter / 20) % 2) == 0) DrawTextEx(pref, "_", (Vector2) {(int)textBox.x + 5 + ((float)(mult_fact * TEXT_SIZE) / 2) * (letterCount[rowCount]), (int)textBox.y + 12 + (LINE_GAP * rowCount)}, (mult_fact * TEXT_SIZE), TEXT_SPACING, BLACK);
+                    if (((framesCounter / 20) % 2) == 0) DrawTextEx(pref, "_", (Vector2) {(int)textBox.x + 5 + ((float)(mult_fact * TEXT_SIZE) / 2) * ((mode == 0) ? letterCount[rowCount]:cur_pos[rowCount]), (int)textBox.y + 12 + (LINE_GAP * rowCount)}, (mult_fact * TEXT_SIZE), TEXT_SPACING, BLACK);
                 }
                 else DrawText("Press BACKSPACE to delete chars...", 2, 440, 20, GRAY);
             }
