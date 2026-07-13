@@ -137,32 +137,38 @@ int main(void)
                     }
 
                     else if (cur_pos[rowCount] == 0) {
-                        char temp[letterCount[rowCount] + 1 - cur_pos[rowCount]];
-                        memcpy(temp, name[rowCount] + cur_pos[rowCount], letterCount[rowCount] + 1 - cur_pos[rowCount]);
-                        name[rowCount][cur_pos[rowCount]] = '\0';
+                        if (rowCount > 0) {
+                            char temp[letterCount[rowCount] + 1 - cur_pos[rowCount]];
+                            memcpy(temp, name[rowCount] + cur_pos[rowCount], letterCount[rowCount] + 1 - cur_pos[rowCount]);
+                            name[rowCount][cur_pos[rowCount]] = '\0';
                         
-                        //fprintf(stderr, "[|%s|\n|%s|\n", name[rowCount - 1], temp);
-                        rowCount--;
-                        //abd0
-                        //0123
-                        memcpy(name[rowCount] + letterCount[rowCount], temp, sizeof(temp));
-                        //fprintf(stderr, "|%c|\n", name[rowCount][letterCount[rowCount]]);
-                        cur_pos[rowCount] = letterCount[rowCount];
-                        letterCount[rowCount] += sizeof(temp) - 1;
-                        //fprintf(stderr, "|%s|\ncur_pos = %d\nletterCount = %d]\n", name[rowCount], cur_pos[rowCount], letterCount[rowCount]);
+                            //fprintf(stderr, "[|%s|\n|%s|\n", name[rowCount - 1], temp);
+                            rowCount--;
+                            //abd0
+                            //0123
+                            memcpy(name[rowCount] + letterCount[rowCount], temp, sizeof(temp));
+                            //fprintf(stderr, "|%c|\n", name[rowCount][letterCount[rowCount]]);
+                            cur_pos[rowCount] = letterCount[rowCount];
+                            letterCount[rowCount] += sizeof(temp) - 1;
+                            //fprintf(stderr, "|%s|\ncur_pos = %d\nletterCount = %d]\n", name[rowCount], cur_pos[rowCount], letterCount[rowCount]);
+                        }
+
+                        else if (rowCount <= 0) {
+                            rowCount = 0;
+                        }
+                
                     }
+        
                 }
-
-
 
            }
             
             if (IsKeyPressed(KEY_LEFT)) {
-                ////fprintf(stderr, "Bonjour! je suis LEFT!\n");
+                //fprintf(stderr, "Bonjour! je suis LEFT!\n");
                 
                 if (mode == 0) {
                     
-                    ////fprintf(stderr, "Bonjour! je suis LEFT et mode est 0!\n");
+                    //fprintf(stderr, "Bonjour! je suis LEFT et mode est 0!\n");
 
                     if (letterCount[rowCount] <= 0) {
                         cur_pos[rowCount] = 0;
@@ -170,7 +176,7 @@ int main(void)
                     else {
                         cur_pos[rowCount] = letterCount[rowCount] - 1;
                         
-                        ////fprintf(stderr, "Bonjour! je suis LEFT et mode est 0! est cur_pos has been updated to %d\n", cur_pos[rowCount]);   
+                        //fprintf(stderr, "Bonjour! je suis LEFT et mode est 0! est cur_pos has been updated to %d\n", cur_pos[rowCount]);   
                         mode = 1;
                     }
                 }
