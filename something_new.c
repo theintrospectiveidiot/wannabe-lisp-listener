@@ -246,7 +246,7 @@ int main(void)
 
             ClearBackground(MY_COL_TWO);
 
-            DrawText("PLACE MOUSE OVER INPUT BOX!", 2, 5, 20, GRAY);
+            DrawText("DO ANYTHING YOU WANT!", 2, 5, 20, GRAY);
 
             DrawRectangleRec(textBox, MY_COL_ONE);
             if (mouseOnText) DrawRectangleLines((int)textBox.x, (int)textBox.y, (int)textBox.width, (int)textBox.height, RED);
@@ -258,7 +258,7 @@ int main(void)
             }
 
 
-            DrawText(TextFormat("INPUT CHARS: %i/%i", letterCount[rowCount], MAX_INPUT_CHARS), 2, 425, 20, DARKGRAY);
+            DrawText(TextFormat("CURSOR POSITION: (%d, %d)", rowCount, cur_pos[rowCount]), 2, 425, 20, DARKGRAY);
 
             if (mouseOnText)
             {
