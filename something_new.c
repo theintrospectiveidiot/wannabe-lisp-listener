@@ -25,7 +25,7 @@ int main(void)
     const int screenHeight = 500;
     
     mult_fact = 1;
-    InitWindow(screenWidth, screenHeight, "raylib [text] example - input box");
+    InitWindow(screenWidth, screenHeight, "cheap text editor fow now");
     Font pref = LoadFontEx("all-stuff2/Terminus.ttf", (mult_fact * TEXT_SIZE), NULL, 0);
     //printf("baseSize = %d\n", pref.baseSize);
     //printf("glyphCount = %d\n", pref.glyphCount);
