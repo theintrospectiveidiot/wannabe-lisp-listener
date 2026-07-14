@@ -118,8 +118,12 @@ int main(void)
 
                 
                     else if (letterCount[rowCount] == 0) {
-                         
+                       
                         if (rowCount > 0) {
+                            if ((rowCount - lb_rows) == 0) {
+
+                                lb_rows -= 1;
+                            }
                             rowCount -= 1;
                         }
 
@@ -319,7 +323,7 @@ int main(void)
             if (mouseOnText) DrawRectangleLines((int)textBox.x, (int)textBox.y, (int)textBox.width, (int)textBox.height, RED);
             else DrawRectangleLines((int)textBox.x, (int)textBox.y, (int)textBox.width, (int)textBox.height, DARKGRAY);
 
-            for (int i = lb_rows; i <= lb_rows + MAX_ROWS; i++) {
+            for (int i = lb_rows; i < lb_rows + MAX_ROWS; i++) {
                 
                 DrawTextEx(pref, name[i] + lb_chars, (Vector2) {(int)textBox.x + 5, (int)textBox.y + 8 + (LINE_GAP * (i - lb_rows))}, (mult_fact * TEXT_SIZE), TEXT_SPACING, BLACK);
             }
@@ -335,7 +339,7 @@ int main(void)
                     float cursorWidth = (MeasureTextEx(pref, name[rowCount], (mult_fact * TEXT_SIZE), TEXT_SPACING).x) / letterCount[rowCount];
                     //fprintf(stdout, "%f\n", cursorWidth);
                     float x = MeasureTextEx(pref, name[rowCount], (mult_fact * TEXT_SIZE), TEXT_SPACING).x;
-                    if (((framesCounter / 20) % 2) == 0) DrawTextEx(pref, "_", (Vector2) {(int)textBox.x + 5 + ((float)(mult_fact * TEXT_SIZE) / 2) * ((mode == 0) ? letterCount[rowCount]:cur_pos[rowCount]), (int)textBox.y + 12 + (LINE_GAP * ((rowCount >= MAX_ROWS) ? (rowCount - lb_rows) : rowCount))}, (mult_fact * TEXT_SIZE), TEXT_SPACING, BLACK);
+                    if (((framesCounter / 20) % 2) == 0) DrawTextEx(pref, "_", (Vector2) {(int)textBox.x + 5 + ((float)(mult_fact * TEXT_SIZE) / 2) * ((mode == 0) ? letterCount[rowCount]:cur_pos[rowCount]), (int)textBox.y + 12 + (LINE_GAP * ((lb_rows > 0) ? (rowCount - lb_rows) : rowCount))}, (mult_fact * TEXT_SIZE), TEXT_SPACING, BLACK);
                 }
                 //else DrawText("Press BACKSPACE to delete chars...", 2, 460, 20, GRAY);
             }
