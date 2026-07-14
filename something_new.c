@@ -193,18 +193,18 @@ int main(void)
             }
 
             if (IsKeyPressed(KEY_DOWN)) {
-                if (rowCount < MAX_ROWS) {
-                    if (letterCount[rowCount] > letterCount[rowCount + 1]) {
+                if ((rowCount + 1 - lb_rows) < MAX_ROWS) {
+                    if (letterCount[rowCount] < letterCount[rowCount + 1]) {
                         cur_pos[rowCount + 1] = cur_pos[rowCount];
                         rowCount += 1;
                         mode = 1;
                     }
-                    else if (letterCount[rowCount] <= letterCount[rowCount + 1]) {
+                    else if (letterCount[rowCount] >= letterCount[rowCount + 1]) {
                         rowCount += 1;
                         mode = 0;
                     }
                 }
-                else if (rowCount == MAX_ROWS) {
+                else if ((rowCount + 1 - lb_rows) == MAX_ROWS) {
                     
                     rowCount++;
                     lb_rows++;
