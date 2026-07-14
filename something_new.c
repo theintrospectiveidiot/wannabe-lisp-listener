@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#define MAX_INPUT_CHARS     100
-#define MAX_ROWS            10
+#define MAX_INPUT_CHARS     79
+#define MAX_ROWS            17
 
 #define TEXT_SIZE           20
 #define LINE_GAP            (TEXT_SIZE + 2)
@@ -21,12 +21,12 @@ int main(void)
 {
     // Initialization
     //--------------------------------------------------------------------------------------
-    const int screenWidth = 800;
+    const int screenWidth = 806;
     const int screenHeight = 500;
     
     mult_fact = 1;
     InitWindow(screenWidth, screenHeight, "cheap text editor fow now");
-    Font pref = LoadFontEx("all-stuff2/Terminus.ttf", (mult_fact * TEXT_SIZE), NULL, 0);
+    Font pref = LoadFontEx("Fonts/Terminus.ttf", (mult_fact * TEXT_SIZE), NULL, 0);
     //printf("baseSize = %d\n", pref.baseSize);
     //printf("glyphCount = %d\n", pref.glyphCount);
     //printf("texture.id = %u\n", pref.texture.id);
@@ -46,7 +46,7 @@ int main(void)
     // 0 when the cur_pos and letterCount + 1 are same.
     // 1 when the cur_pos and letterCount + 1 are NOT same.
 
-    Rectangle textBox = { 0, 40, 800, 380 };
+    Rectangle textBox = { 0, 40, 806, 390 };
     bool mouseOnText = true;
 
     int framesCounter = 0;
@@ -258,7 +258,7 @@ int main(void)
             }
 
 
-            DrawText(TextFormat("CURSOR POSITION: (%d, %d)", rowCount, cur_pos[rowCount]), 2, 425, 20, DARKGRAY);
+            DrawText(TextFormat("CURSOR POSITION: (%d, %d)", rowCount, cur_pos[rowCount]), 2, 450, 20, DARKGRAY);
 
             if (mouseOnText)
             {
@@ -270,7 +270,7 @@ int main(void)
                     float x = MeasureTextEx(pref, name[rowCount], (mult_fact * TEXT_SIZE), TEXT_SPACING).x;
                     if (((framesCounter / 20) % 2) == 0) DrawTextEx(pref, "_", (Vector2) {(int)textBox.x + 5 + ((float)(mult_fact * TEXT_SIZE) / 2) * ((mode == 0) ? letterCount[rowCount]:cur_pos[rowCount]), (int)textBox.y + 12 + (LINE_GAP * rowCount)}, (mult_fact * TEXT_SIZE), TEXT_SPACING, BLACK);
                 }
-                else DrawText("Press BACKSPACE to delete chars...", 2, 440, 20, GRAY);
+                //else DrawText("Press BACKSPACE to delete chars...", 2, 460, 20, GRAY);
             }
 
         EndDrawing();
