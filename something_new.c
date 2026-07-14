@@ -173,12 +173,16 @@ int main(void)
             
             if (IsKeyPressed(KEY_UP)) {
                 if (rowCount > 0) {
+                    if ((lb_rows > 0) && ((rowCount - lb_rows) == 0)) {
+                        fprintf(stderr, "bonjour! lb_rows est %d\n", lb_rows);
+                        lb_rows -= 1;
+                    }
                     if (letterCount[rowCount] < letterCount[rowCount - 1]) {
                         cur_pos[rowCount - 1] = cur_pos[rowCount];
                         rowCount -= 1;
                         mode = 1;
                     }
-                    else if (letterCount[rowCount] >= letterCount[rowCount + 1]) {
+                    else if (letterCount[rowCount] >= letterCount[rowCount - 1]) {
                         rowCount--;
                         mode = 0;
                     }
@@ -201,7 +205,9 @@ int main(void)
                     }
                 }
                 else if (rowCount == MAX_ROWS) {
-                    rowCount = MAX_ROWS;
+                    
+                    rowCount++;
+                    lb_rows++;
                 }
             }
 
