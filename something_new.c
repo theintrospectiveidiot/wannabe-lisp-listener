@@ -46,9 +46,9 @@ int main(void)
     int lb_rows  = 0;
     int lb_chars = 0;
     
-    int cur_pos[MAX_ROWS]     = {0};
-    int letterCount[MAX_ROWS] = {0};
-    int rowCount              =  0;
+    int cur_pos[ROWS_CAPACITY]     = {0};
+    int letterCount[ROWS_CAPACITY] = {0};
+    int rowCount                   =  0;
     
     int mode = 0; 
     // 0 when the cur_pos and letterCount + 1 are same.
