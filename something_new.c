@@ -21,7 +21,7 @@ int main(void)
 {
     // Initialization
     //--------------------------------------------------------------------------------------
-    const int screenWidth = 806;
+    const int screenWidth  = 806;
     const int screenHeight = 500;
     
     mult_fact = 1;
@@ -98,7 +98,7 @@ int main(void)
 
                 key = GetCharPressed();  // Check next character in the queue
             }
-
+            
             if (IsKeyPressed(KEY_BACKSPACE))
             {
                 
@@ -161,8 +161,42 @@ int main(void)
         
                 }
 
-           }
+            }
             
+            if (IsKeyPressed(KEY_UP)) {
+                if (rowCount > 0) {
+                    if (letterCount[rowCount] < letterCount[rowCount - 1]) {
+                        cur_pos[rowCount - 1] = cur_pos[rowCount];
+                        rowCount -= 1;
+                        mode = 1;
+                    }
+                    else if (letterCount[rowCount] >= letterCount[rowCount + 1]) {
+                        rowCount--;
+                        mode = 0;
+                    }
+                }
+                else if (rowCount == 0) {
+                    rowCount = 0;
+                }
+            }
+
+            if (IsKeyPressed(KEY_DOWN)) {
+                if (rowCount < MAX_ROWS) {
+                    if (letterCount[rowCount] > letterCount[rowCount + 1]) {
+                        cur_pos[rowCount + 1] = cur_pos[rowCount];
+                        rowCount += 1;
+                        mode = 1;
+                    }
+                    else if (letterCount[rowCount] <= letterCount[rowCount + 1]) {
+                        rowCount += 1;
+                        mode = 0;
+                    }
+                }
+                else if (rowCount == MAX_ROWS) {
+                    rowCount = MAX_ROWS;
+                }
+            }
+
             if (IsKeyPressed(KEY_LEFT)) {
                 //fprintf(stderr, "Bonjour! je suis LEFT!\n");
                 
@@ -214,6 +248,7 @@ int main(void)
             {
                 if (mode == 0) {
                     rowCount++;
+                    
                 }
 
                 else if (mode == 1) 
@@ -228,9 +263,20 @@ int main(void)
                      rowCount++;
                      //abd0
                      //0123
-                     memcpy(name[rowCount], temp, sizeof(temp));
-                     letterCount[rowCount] = sizeof(temp) - 1;
-                     cur_pos[rowCount] = 0;
+                     if (letterCount[rowCount] > 0) {
+                        char temp2[letterCount[rowCount]];
+                        memcpy(temp2, name[rowCount], letterCount[rowCount] + 1);
+                        memcpy(name[rowCount], temp, sizeof(temp));
+                        memcpy(name[rowCount] + sizeof(temp) - 1, temp2, sizeof(temp2));
+                        letterCount[rowCount] += sizeof(temp) - 1;
+                        cur_pos[rowCount] = 0;
+                     }
+
+                    else if (letterCount[rowCount] == 0) {
+                        memcpy(name[rowCount], temp, sizeof(temp));
+                        letterCount[rowCount] += sizeof(temp) - 1;
+                        cur_pos[rowCount] = 0;
+                    }
                 }
             }
         }
