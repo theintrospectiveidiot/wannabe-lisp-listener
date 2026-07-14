@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define INPUT_CHAR_CAPACITY 1000
+#define INPUT_CHARS_CAPACITY 1000
 #define ROWS_CAPACITY       8000
 
 // have hardcoded a long capacity, hoping that we dont need to worry about what happens beyond that.
@@ -36,13 +36,15 @@ int main(void)
     //printf("baseSize = %d\n", pref.baseSize);
     //printf("glyphCount = %d\n", pref.glyphCount);
     //printf("texture.id = %u\n", pref.texture.id);
-    char name[ROWS_CAPACITY][INPUT_CHAR_CAPACITY] = {0};
+    char name[ROWS_CAPACITY][INPUT_CHARS_CAPACITY] = {0};
     // NOTE: One extra space required for null terminator char '\0'
     
     /*for (int i = 0; i < MAX_ROWS; i++) {
         name[i][MAX_INPUT_CHARS + 1] = '\0';
     }*/
     
+    int lb_rows  = 0;
+    int lb_chars = 0;
     
     int cur_pos[MAX_ROWS]     = {0};
     int letterCount[MAX_ROWS] = {0};
@@ -77,7 +79,7 @@ int main(void)
             while (key > 0)
             {
                 // NOTE: Only allow keys in range [32..125]
-                if (((key >= 32) && (key <= 125)) && (letterCount[rowCount] < MAX_INPUT_CHARS))
+                if (((key >= 32) && (key <= 125)) && (letterCount[rowCount] < INPUT_CHARS_CAPACITY))
                 {
                     //at the last position
                     if (mode == 0)
@@ -254,35 +256,41 @@ int main(void)
             {
                 if (mode == 0) {
                     rowCount++;
-                    
+                    if (rowCount >= MAX_ROWS) {
+                        lb_rows = rowCount + 1 - MAX_ROWS;
+                    }
                 }
 
                 else if (mode == 1) 
-                {   
-                     char temp[letterCount[rowCount] + 1 - cur_pos[rowCount]];
-                     memcpy(temp, name[rowCount] + cur_pos[rowCount], letterCount[rowCount] + 1 - cur_pos[rowCount]);
-                     name[rowCount][cur_pos[rowCount]] = '\0';
-                     letterCount[rowCount] = cur_pos[rowCount];
-                     //fprintf(stderr, "|%s|\n|%s|\n", name[rowCount], temp);
-                     
-                     
-                     rowCount++;
-                     //abd0
-                     //0123
-                     if (letterCount[rowCount] > 0) {
-                        char temp2[letterCount[rowCount]];
-                        memcpy(temp2, name[rowCount], letterCount[rowCount] + 1);
-                        memcpy(name[rowCount], temp, sizeof(temp));
-                        memcpy(name[rowCount] + sizeof(temp) - 1, temp2, sizeof(temp2));
-                        letterCount[rowCount] += sizeof(temp) - 1;
-                        cur_pos[rowCount] = 0;
-                     }
+                {    
+                    
+                    char temp[letterCount[rowCount] + 1 - cur_pos[rowCount]];
+                    memcpy(temp, name[rowCount] + cur_pos[rowCount], letterCount[rowCount] + 1 - cur_pos[rowCount]);
+                    name[rowCount][cur_pos[rowCount]] = '\0';
+                    letterCount[rowCount] = cur_pos[rowCount];
+                    //fprintf(stderr, "|%s|\n|%s|\n", name[rowCount], temp); 
+                    rowCount++;
+                    if (rowCount >= MAX_ROWS) {
+                        lb_rows = rowCount + 1 - MAX_ROWS;
+                    }
+                    //abcd0
+                    //0123
+                    if (letterCount[rowCount] > 0) {
+                       char temp2[letterCount[rowCount]];
+                       memcpy(temp2, name[rowCount], letterCount[rowCount] + 1);
+                       memcpy(name[rowCount], temp, sizeof(temp));
+                       memcpy(name[rowCount] + sizeof(temp) - 1, temp2, sizeof(temp2));
+                       letterCount[rowCount] += sizeof(temp) - 1;
+                       cur_pos[rowCount] = 0;
+                    }
 
                     else if (letterCount[rowCount] == 0) {
-                        memcpy(name[rowCount], temp, sizeof(temp));
-                        letterCount[rowCount] += sizeof(temp) - 1;
-                        cur_pos[rowCount] = 0;
+                         memcpy(name[rowCount], temp, sizeof(temp));
+                         letterCount[rowCount] += sizeof(temp) - 1;
+                         cur_pos[rowCount] = 0;
                     }
+
+                   
                 }
             }
         }
@@ -304,9 +312,9 @@ int main(void)
             if (mouseOnText) DrawRectangleLines((int)textBox.x, (int)textBox.y, (int)textBox.width, (int)textBox.height, RED);
             else DrawRectangleLines((int)textBox.x, (int)textBox.y, (int)textBox.width, (int)textBox.height, DARKGRAY);
 
-            for (int i = 0; i <= MAX_ROWS; i++) {
+            for (int i = lb_rows; i <= lb_rows + MAX_ROWS; i++) {
                 
-                DrawTextEx(pref, name[i], (Vector2) {(int)textBox.x + 5, (int)textBox.y + 8 + (LINE_GAP * i)}, (mult_fact * TEXT_SIZE), TEXT_SPACING, BLACK);
+                DrawTextEx(pref, name[i] + lb_chars, (Vector2) {(int)textBox.x + 5, (int)textBox.y + 8 + (LINE_GAP * (i - lb_rows))}, (mult_fact * TEXT_SIZE), TEXT_SPACING, BLACK);
             }
 
 
@@ -314,13 +322,13 @@ int main(void)
 
             if (mouseOnText)
             {
-                if ((letterCount[rowCount] < MAX_INPUT_CHARS) && (rowCount < MAX_ROWS))
+                if ((letterCount[rowCount] < INPUT_CHARS_CAPACITY) && (rowCount < ROWS_CAPACITY))
                 {
                     // Draw blinking underscore char
                     float cursorWidth = (MeasureTextEx(pref, name[rowCount], (mult_fact * TEXT_SIZE), TEXT_SPACING).x) / letterCount[rowCount];
                     //fprintf(stdout, "%f\n", cursorWidth);
                     float x = MeasureTextEx(pref, name[rowCount], (mult_fact * TEXT_SIZE), TEXT_SPACING).x;
-                    if (((framesCounter / 20) % 2) == 0) DrawTextEx(pref, "_", (Vector2) {(int)textBox.x + 5 + ((float)(mult_fact * TEXT_SIZE) / 2) * ((mode == 0) ? letterCount[rowCount]:cur_pos[rowCount]), (int)textBox.y + 12 + (LINE_GAP * rowCount)}, (mult_fact * TEXT_SIZE), TEXT_SPACING, BLACK);
+                    if (((framesCounter / 20) % 2) == 0) DrawTextEx(pref, "_", (Vector2) {(int)textBox.x + 5 + ((float)(mult_fact * TEXT_SIZE) / 2) * ((mode == 0) ? letterCount[rowCount]:cur_pos[rowCount]), (int)textBox.y + 12 + (LINE_GAP * ((rowCount >= MAX_ROWS) ? (rowCount - lb_rows) : rowCount))}, (mult_fact * TEXT_SIZE), TEXT_SPACING, BLACK);
                 }
                 //else DrawText("Press BACKSPACE to delete chars...", 2, 460, 20, GRAY);
             }
