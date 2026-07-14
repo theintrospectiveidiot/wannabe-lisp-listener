@@ -113,11 +113,12 @@ int main(void)
                 if (mode == 0) {
                     if (letterCount[rowCount] > 0) {
                         letterCount[rowCount]--;
+                        name[rowCount][letterCount[rowCount]] = '\0';
                     }
 
                 
                     else if (letterCount[rowCount] == 0) {
-                    
+                         
                         if (rowCount > 0) {
                             rowCount -= 1;
                         }
@@ -141,7 +142,7 @@ int main(void)
                         //0123
                         memcpy(name[rowCount] + cur_pos[rowCount], temp, letterCount[rowCount] - cur_pos[rowCount]);
                         letterCount[rowCount]--;
-
+                        name[rowCount][letterCount[rowCount]] = '\0';
                     }
 
                     else if (cur_pos[rowCount] == 0) {
@@ -149,7 +150,7 @@ int main(void)
                             char temp[letterCount[rowCount] + 1 - cur_pos[rowCount]];
                             memcpy(temp, name[rowCount] + cur_pos[rowCount], letterCount[rowCount] + 1 - cur_pos[rowCount]);
                             name[rowCount][cur_pos[rowCount]] = '\0';
-                        
+                            letterCount[rowCount] = 0; 
                             //fprintf(stderr, "[|%s|\n|%s|\n", name[rowCount - 1], temp);
                             rowCount--;
                             //abd0
