@@ -2,6 +2,12 @@
 #include <stdio.h>
 #include <string.h>
 
+#define INPUT_CHAR_CAPACITY 1000
+#define ROWS_CAPACITY       8000
+
+// have hardcoded a long capacity, hoping that we dont need to worry about what happens beyond that.
+// cuz the main aim of this isnt a good text editor, its a basic text editor with hopefully something cool!
+
 #define MAX_INPUT_CHARS     79
 #define MAX_ROWS            17
 
@@ -30,7 +36,7 @@ int main(void)
     //printf("baseSize = %d\n", pref.baseSize);
     //printf("glyphCount = %d\n", pref.glyphCount);
     //printf("texture.id = %u\n", pref.texture.id);
-    char name[MAX_ROWS][MAX_INPUT_CHARS] = {0};
+    char name[ROWS_CAPACITY][INPUT_CHAR_CAPACITY] = {0};
     // NOTE: One extra space required for null terminator char '\0'
     
     /*for (int i = 0; i < MAX_ROWS; i++) {
