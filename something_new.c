@@ -1,5 +1,6 @@
 #include <raylib.h>
 #include <stdio.h>
+#include <time.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -27,6 +28,7 @@ struct Line {
     int char_count;                                //letterCount basically
     int cursor_pos;                                //cur_pos, duh!
 
+    int random;
     Line *prev;
     Line *next;
 }; 
@@ -36,6 +38,8 @@ Line *make_line() {
 
     new_line->line_data = malloc(sizeof(char) * (INPUT_CHARS_CAPACITY + 1));
      
+    srand(time(0));
+    new_line->random = rand();
     new_line->char_count = 0;
     new_line->cursor_pos = 0;
 
@@ -181,7 +185,7 @@ int main(void)
                     else if (cur_line->char_count == 0) {
                        
                         if (row_count > 0) {
-                            if (row_count - lb_rows == 0) {
+                            if ((lb_rows > 0) && (row_count - lb_rows == 0)) {
                                 lb_rows -= 1;
                                 top = top->prev;
                             }
@@ -244,8 +248,8 @@ int main(void)
                             //fprintf(stderr, "|%s|\ncur_pos = %d\nletterCount = %d]\n", name[rowCount], cur_pos[rowCount], letterCount[rowCount]);
                             */
                             
-                            if (row_count - lb_chars == 0) {
-                                lb_chars -= 1; 
+                            if (row_count - lb_rows == 0) {
+                                lb_rows -= 1; 
                                 top = top->prev;
                             }
 
@@ -310,30 +314,29 @@ int main(void)
             if (IsKeyPressed(KEY_DOWN)) {
                 
                 if (cur_line->next != NULL) {
-                    if ((row_count + 1 - lb_rows) < MAX_ROWS) {
-                        //basically no scrolling part
-                        if (cur_line->cursor_pos < cur_line->next->char_count) {
-                            cur_line->next->cursor_pos = cur_line->cursor_pos;
-                            cur_line = cur_line->next;
-                            row_count += 1;
-                            mode = 1;
-                        }
-                        else if (cur_line->cursor_pos >= cur_line->next->char_count) {
-                            cur_line = cur_line->next;
-                            row_count += 1;
-                            mode = 0;
-                        }
+                    if ((row_count + 1 - lb_rows) >= MAX_ROWS) {
+                        top = top->prev;
+                        lb_rows += 1;
                     }
-                    else if ((row_count + 1 - lb_rows) == MAX_ROWS) {
-                        //yes - scrolling part
-                        top = top->next;
-                        row_count++;
-                        lb_rows++;
+
+                    if (cur_line->cursor_pos < cur_line->next->char_count) {
+                        cur_line->next->cursor_pos = cur_line->cursor_pos;
+                        cur_line = cur_line->next;
+                        row_count += 1;
+                        mode = 1;
+                    }
+                    
+                    else if (cur_line->cursor_pos >= cur_line->next->char_count) {
+                        cur_line = cur_line->next;
+                        row_count += 1;
+                        mode = 0;
                     }
                 }
+             
 
                 else if (cur_line->next == NULL) {
                     //do nothing
+                    
                 }
             }
 
@@ -403,7 +406,7 @@ int main(void)
                     }
 
                     if (row_count >= MAX_ROWS) {
-                        lb_rows += row_count + 1 - MAX_ROWS;
+                        lb_rows += 1;
                         top = top->next;
                     }
                 }
@@ -449,7 +452,7 @@ int main(void)
                     free(temp);
 
                     if (row_count >= MAX_ROWS) {
-                        lb_rows += row_count + 1 - MAX_ROWS;
+                        lb_rows += 1;
                         top = top->next;
                     }
                     //abc4
@@ -471,8 +474,6 @@ int main(void)
                        cur_pos[rowCount] = 0;
                        }
                     */
-
-                   
                 }
             }
         }
@@ -514,7 +515,7 @@ int main(void)
                     //float cursorWidth = (MeasureTextEx(pref, name[rowCount], (mult_fact * TEXT_SIZE), TEXT_SPACING).x) / letterCount[rowCount];
                     //fprintf(stdout, "%f\n", cursorWidth);
                     //float x = MeasureTextEx(pref, name[rowCount], (mult_fact * TEXT_SIZE), TEXT_SPACING).x;
-                    if (((framesCounter / 20) % 2) == 0) DrawTextEx(pref, "_", (Vector2) {(int)textBox.x + 5 + ((float)(mult_fact * TEXT_SIZE) / 2) * ((mode == 0) ? cur_line->char_count:cur_line->cursor_pos), (int)textBox.y + 12 + (LINE_GAP * ((lb_rows > 0) ? (row_count - lb_rows) : row_count))}, (mult_fact * TEXT_SIZE), TEXT_SPACING, BLACK);
+                    if (((framesCounter / 20) % 1) == 0) DrawTextEx(pref, "_", (Vector2) {(int)textBox.x + 5 + ((float)(mult_fact * TEXT_SIZE) / 2) * ((mode == 0) ? cur_line->char_count:cur_line->cursor_pos), (int)textBox.y + 12 + (LINE_GAP * ((lb_rows > 0) ? (row_count - lb_rows) : row_count))}, (mult_fact * TEXT_SIZE), TEXT_SPACING, BLACK);
 
                 }
                 //else DrawText("Press BACKSPACE to delete chars...", 2, 460, 20, GRAY);
