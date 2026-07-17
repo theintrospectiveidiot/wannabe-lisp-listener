@@ -315,7 +315,7 @@ int main(void)
                 
                 if (cur_line->next != NULL) {
                     if ((row_count + 1 - lb_rows) >= MAX_ROWS) {
-                        top = top->prev;
+                        top = top->next;
                         lb_rows += 1;
                     }
 
