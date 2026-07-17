@@ -1,6 +1,7 @@
 #include <raylib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #define INPUT_CHARS_CAPACITY    1000
 #define ROWS_CAPACITY           8000
@@ -17,6 +18,65 @@
 
 #define MY_COL_ONE              CLITERAL(Color){ 201, 195, 131, 245 }
 #define MY_COL_TWO              CLITERAL(Color){ 190, 185, 161, 145 }
+
+typedef struct Line Line;
+
+struct Line {
+    char *line_data;
+    
+    int char_count;                                //letterCount basically
+    int index;                                     //rowCount basically
+    int cursor_pos;                                //cur_pos, duh!
+
+    Line *prev;
+    Line *next;
+}; 
+
+Line *make_line(int index) {
+    Line *new_line = malloc (sizeof (Line));
+
+    new_line->line_data = malloc(sizeof(char) * (INPUT_CHARS_CAPACITY + 1));
+    
+    new_line->index = index;
+    new_line->char_count = 0;
+    new_line->cursor_pos = 0;
+    
+    new_line->prev = NULL;
+    new_line->next = NULL;
+
+    return new_line;
+}
+
+void on_stage(Line performers[], Line *lead) {
+    
+    performers[0] = lead;
+    for (int i = 1, i < MAX_ROWS, ++i) {
+        
+        if (performers[i - 1]->next != NULL) {
+            perfomers[i] = performers[i - 1]->next;
+        }
+        else performers[i] = NULL;
+    }
+}
+
+Line *starting_line;
+
+Line *search_by_index(int val, Line *lead) {
+    
+    if (lead == NULL) {
+        return lead;
+    }
+
+    if (lead->index == val) {
+        return temp;
+    } 
+    else if (lead->next != NULL) {
+        search_by_index(val, temp->next);
+    }
+    else if (lead->next == NULL) {
+        return lead;
+    }
+}
 
 int mult_fact;
 
@@ -39,6 +99,7 @@ int main(void)
     char name[ROWS_CAPACITY][INPUT_CHARS_CAPACITY] = {0};
     // NOTE: One extra space required for null terminator char '\0'
     
+
     /*for (int i = 0; i < MAX_ROWS; i++) {
         name[i][MAX_INPUT_CHARS + 1] = '\0';
     }*/
@@ -50,6 +111,9 @@ int main(void)
     int letterCount[ROWS_CAPACITY] = {0};
     int rowCount                   =  0;
     
+    starting_line = make_line(0);
+    Line *cur_line = starting_line;
+
     int mode = 0; 
     // 0 when the cur_pos and letterCount + 1 are same.
     // 1 when the cur_pos and letterCount + 1 are NOT same.
@@ -66,6 +130,7 @@ int main(void)
         
         if (mode == 0) {
             cur_pos[rowCount] = letterCount[rowCount];
+
         }
 
         if (mouseOnText)
@@ -84,15 +149,20 @@ int main(void)
                     //at the last position
                     if (mode == 0)
                     {
-                        name[rowCount][letterCount[rowCount]] = (char) key;
+                        /*name[rowCount][letterCount[rowCount]] = (char) key;
                         name[rowCount][letterCount[rowCount] + 1] = '\0'; // Add null terminator at the end of the string
-                        letterCount[rowCount]++;
+                        letterCount[rowCount]++;*/
+
+                        cur_line->line_data[cur_line->char_count] = (char) key;
+                        cur_line->line_data[(cur_line->char_count) + 1] = '\0';
+                        cur_line->char_count += 1;
                     }
                     
                     //letterCount[rowCount] is always at the null terminator. 
 
                     //not at the last position
                     else if (mode == 1) {
+                        /*
                         char temp[letterCount[rowCount] + 1 - cur_pos[rowCount]];
                         memcpy(temp, name[rowCount] + cur_pos[rowCount], letterCount[rowCount] + 1 - cur_pos[rowCount]);
                         name[rowCount][cur_pos[rowCount]] = (char) key;
@@ -101,6 +171,16 @@ int main(void)
                         //01234
                         memcpy(name[rowCount] + cur_pos[rowCount], temp, letterCount[rowCount] + 2 - cur_pos[rowCount]);
                         letterCount[rowCount]++;
+                        */
+
+                        char *temp = malloc(sizeof(char) * (cur_line->char_count + 1 - cur_line->cursor_pos));
+                        memcpy(temp, cur_line->line_data + cur_line->cursor_pos, cur_line->char_count + 1 - cur_line->cursor_pos);
+                        cur_line->line_data[cur_line->cursor_pos] = (char) key;
+                        cur_line->cursor_pos += 1;
+                        cur_line->char_count += 1;
+
+                        memcpy(cur_line->line_data + cur_line->cursor_pos, temp, cur_line->char_count + 1 - cur_line->cursor_pos);
+                        free(temp);
                     }
                 }
 
@@ -111,30 +191,32 @@ int main(void)
             {
                 
                 if (mode == 0) {
-                    if (letterCount[rowCount] > 0) {
-                        letterCount[rowCount]--;
-                        name[rowCount][letterCount[rowCount]] = '\0';
+                    if (cur_line->char_count > 0) {
+                        cur_line->char_count -= 1;
+                        cur_line->line_data[cur_line->char_count] = '\0';
                     }
 
                 
-                    else if (letterCount[rowCount] == 0) {
+                    else if (cur_line->char_count == 0) {
                        
-                        if (rowCount > 0) {
-                            if ((rowCount - lb_rows) == 0) {
-
+                        if (cur_line->index > 0) {
+                            if ((cur_line->index - lb_rows) == 0) {
                                 lb_rows -= 1;
                             }
-                            rowCount -= 1;
+                            
+                            cur_line->next->prev = cur_line->prev;
+                            cur_line->prev->next = cur_line->next;
+                            
+                            cur_line = cur_line->prev;
                         }
 
-                        else if (rowCount <= 0) {
-                            rowCount = 0;
+                        else if (cur_line->index <= 0) {
+                            cur_line = cur_line;
                         }
             
                     }
-
-                                
-                name[rowCount][letterCount[rowCount]] = '\0';
+            
+                    cur_line->line_data[cur_line->char_count] = '\0';                
                 }
                 
                 else if (mode == 1) {
@@ -323,23 +405,27 @@ int main(void)
             if (mouseOnText) DrawRectangleLines((int)textBox.x, (int)textBox.y, (int)textBox.width, (int)textBox.height, RED);
             else DrawRectangleLines((int)textBox.x, (int)textBox.y, (int)textBox.width, (int)textBox.height, DARKGRAY);
 
+            Line to_show[MAX_ROWS];
+            on_stage(to_show, starting_line);
+
+
             for (int i = lb_rows; i < lb_rows + MAX_ROWS; i++) {
                 
-                DrawTextEx(pref, name[i] + lb_chars, (Vector2) {(int)textBox.x + 5, (int)textBox.y + 8 + (LINE_GAP * (i - lb_rows))}, (mult_fact * TEXT_SIZE), TEXT_SPACING, BLACK);
+                DrawTextEx(pref, i->line_data + lb_chars, (Vector2) {(int)textBox.x + 5, (int)textBox.y + 8 + (LINE_GAP * (i - lb_rows))}, (mult_fact * TEXT_SIZE), TEXT_SPACING, BLACK);
             }
 
 
-            DrawText(TextFormat("CURSOR POSITION: (%d, %d)", rowCount, cur_pos[rowCount]), 2, 450, 20, BLACK);
+            DrawText(TextFormat("CURSOR POSITION: (%d, %d)", cur_line->index, cur_line->cursor_pos), 2, 450, 20, BLACK);
 
             if (mouseOnText)
             {
-                if ((letterCount[rowCount] < INPUT_CHARS_CAPACITY) && (rowCount < ROWS_CAPACITY))
+                if ((cur_line->char_count < INPUT_CHARS_CAPACITY) && (cur_line->index < ROWS_CAPACITY))
                 {
                     // Draw blinking underscore char
-                    float cursorWidth = (MeasureTextEx(pref, name[rowCount], (mult_fact * TEXT_SIZE), TEXT_SPACING).x) / letterCount[rowCount];
+                    //float cursorWidth = (MeasureTextEx(pref, name[rowCount], (mult_fact * TEXT_SIZE), TEXT_SPACING).x) / letterCount[rowCount];
                     //fprintf(stdout, "%f\n", cursorWidth);
-                    float x = MeasureTextEx(pref, name[rowCount], (mult_fact * TEXT_SIZE), TEXT_SPACING).x;
-                    if (((framesCounter / 20) % 2) == 0) DrawTextEx(pref, "_", (Vector2) {(int)textBox.x + 5 + ((float)(mult_fact * TEXT_SIZE) / 2) * ((mode == 0) ? letterCount[rowCount]:cur_pos[rowCount]), (int)textBox.y + 12 + (LINE_GAP * ((lb_rows > 0) ? (rowCount - lb_rows) : rowCount))}, (mult_fact * TEXT_SIZE), TEXT_SPACING, BLACK);
+                    //float x = MeasureTextEx(pref, name[rowCount], (mult_fact * TEXT_SIZE), TEXT_SPACING).x;
+                    if (((framesCounter / 20) % 2) == 0) DrawTextEx(pref, "_", (Vector2) {(int)textBox.x + 5 + ((float)(mult_fact * TEXT_SIZE) / 2) * ((mode == 0) ? cur_line->char_count:cur_line->cursor_pos), (int)textBox.y + 12 + (LINE_GAP * ((lb_rows > 0) ? (cur_line->index - lb_rows) : cur_line->index))}, (mult_fact * TEXT_SIZE), TEXT_SPACING, BLACK);
                 }
                 //else DrawText("Press BACKSPACE to delete chars...", 2, 460, 20, GRAY);
             }
