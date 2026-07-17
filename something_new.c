@@ -2,21 +2,21 @@
 #include <stdio.h>
 #include <string.h>
 
-#define INPUT_CHARS_CAPACITY 1000
-#define ROWS_CAPACITY       8000
+#define INPUT_CHARS_CAPACITY    1000
+#define ROWS_CAPACITY           8000
 
 // have hardcoded a long capacity, hoping that we dont need to worry about what happens beyond that.
 // cuz the main aim of this isnt a good text editor, its a basic text editor with hopefully something cool!
 
-#define MAX_INPUT_CHARS     79
-#define MAX_ROWS            17
+#define MAX_INPUT_CHARS         79
+#define MAX_ROWS                17
 
-#define TEXT_SIZE           20
-#define LINE_GAP            (TEXT_SIZE + 2)
-#define TEXT_SPACING        0.00f
+#define TEXT_SIZE               20
+#define LINE_GAP                (TEXT_SIZE + 2)
+#define TEXT_SPACING            0.00f
 
-#define MY_COL_ONE          CLITERAL(Color){ 201, 195, 131, 245 }
-#define MY_COL_TWO          CLITERAL(Color){ 190, 185, 161, 145 }
+#define MY_COL_ONE              CLITERAL(Color){ 201, 195, 131, 245 }
+#define MY_COL_TWO              CLITERAL(Color){ 190, 185, 161, 145 }
 
 int mult_fact;
 
@@ -317,7 +317,7 @@ int main(void)
 
             ClearBackground(MY_COL_TWO);
 
-            DrawText("DO ANYTHING YOU WANT!", 2, 5, 20, GRAY);
+            DrawText("DO ANYTHING YOU WANT!", 2, 5, 20, BLACK);
 
             DrawRectangleRec(textBox, MY_COL_ONE);
             if (mouseOnText) DrawRectangleLines((int)textBox.x, (int)textBox.y, (int)textBox.width, (int)textBox.height, RED);
@@ -329,7 +329,7 @@ int main(void)
             }
 
 
-            DrawText(TextFormat("CURSOR POSITION: (%d, %d)", rowCount, cur_pos[rowCount]), 2, 450, 20, DARKGRAY);
+            DrawText(TextFormat("CURSOR POSITION: (%d, %d)", rowCount, cur_pos[rowCount]), 2, 450, 20, BLACK);
 
             if (mouseOnText)
             {
