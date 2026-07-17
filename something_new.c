@@ -82,19 +82,10 @@ int main(void)
     //printf("baseSize = %d\n", pref.baseSize);
     //printf("glyphCount = %d\n", pref.glyphCount);
     //printf("texture.id = %u\n", pref.texture.id);
-    char name[ROWS_CAPACITY][INPUT_CHARS_CAPACITY] = {0};
-    // NOTE: One extra space required for null terminator char '\0'
-    
-
-    /*for (int i = 0; i < MAX_ROWS; i++) {
-        name[i][MAX_INPUT_CHARS + 1] = '\0';
-    }*/
     
     int lb_rows  = 0;
     int lb_chars = 0;
     
-    int cur_pos[ROWS_CAPACITY]     = {0};
-    int letterCount[ROWS_CAPACITY] = {0};
 
     int row_count    =  0;
     Line *top       = make_line();
@@ -135,30 +126,14 @@ int main(void)
                     //at the last position
                     if (mode == 0)
                     {
-                        /*name[rowCount][letterCount[rowCount]] = (char) key;
-                        name[rowCount][letterCount[rowCount] + 1] = '\0'; // Add null terminator at the end of the string
-                        letterCount[rowCount]++;*/
-
                         cur_line->line_data[cur_line->char_count] = (char) key;
                         cur_line->line_data[(cur_line->char_count) + 1] = '\0';
                         cur_line->char_count += 1;
                     }
                     
-                    //letterCount[rowCount] is always at the null terminator. 
 
                     //not at the last position
                     else if (mode == 1) {
-                        /*
-                        char temp[letterCount[rowCount] + 1 - cur_pos[rowCount]];
-                        memcpy(temp, name[rowCount] + cur_pos[rowCount], letterCount[rowCount] + 1 - cur_pos[rowCount]);
-                        name[rowCount][cur_pos[rowCount]] = (char) key;
-                        cur_pos[rowCount]++;   
-                        //abcd0
-                        //01234
-                        memcpy(name[rowCount] + cur_pos[rowCount], temp, letterCount[rowCount] + 2 - cur_pos[rowCount]);
-                        letterCount[rowCount]++;
-                        */
-
                         char *temp = malloc(sizeof(char) * (cur_line->char_count + 1 - cur_line->cursor_pos));
                         memcpy(temp, cur_line->line_data + cur_line->cursor_pos, cur_line->char_count + 1 - cur_line->cursor_pos);
                         cur_line->line_data[cur_line->cursor_pos] = (char) key;
@@ -208,17 +183,6 @@ int main(void)
                 
                 else if (mode == 1) {
                     if (cur_line->cursor_pos > 0) {
-                        /*
-                        char temp[letterCount[rowCount] + 1 - cur_pos[rowCount]];
-                        memcpy(temp, name[rowCount] + cur_pos[rowCount], letterCount[rowCount] + 1 - cur_pos[rowCount]);
-                        cur_pos[rowCount]--;   
-                        //abcd0
-                        //01234
-                        memcpy(name[rowCount] + cur_pos[rowCount], temp, letterCount[rowCount] - cur_pos[rowCount]);
-                        letterCount[rowCount]--;
-                        name[rowCount][letterCount[rowCount]] = '\0';
-                        */
-
                         char *temp = malloc (sizeof(char) * (cur_line->char_count + 1 - cur_line->cursor_pos));
                         memcpy(temp, cur_line->line_data + cur_line->cursor_pos, cur_line->char_count + 1 - cur_line->cursor_pos);
                         cur_line->cursor_pos -= 1;
@@ -232,21 +196,6 @@ int main(void)
 
                     else if (cur_line->cursor_pos == 0) {
                         if (row_count > 0) {
-                            /*
-                            char temp[letterCount[rowCount] + 1 - cur_pos[rowCount]];
-                            memcpy(temp, name[rowCount] + cur_pos[rowCount], letterCount[rowCount] + 1 - cur_pos[rowCount]);
-                            name[rowCount][cur_pos[rowCount]] = '\0';
-                            letterCount[rowCount] = 0; 
-                            //fprintf(stderr, "[|%s|\n|%s|\n", name[rowCount - 1], temp);
-                            rowCount--;
-                            //abd0
-                            //0123
-                            memcpy(name[rowCount] + letterCount[rowCount], temp, sizeof(temp));
-                            //fprintf(stderr, "|%c|\n", name[rowCount][letterCount[rowCount]]);
-                            cur_pos[rowCount] = letterCount[rowCount];
-                            letterCount[rowCount] += sizeof(temp) - 1;
-                            //fprintf(stderr, "|%s|\ncur_pos = %d\nletterCount = %d]\n", name[rowCount], cur_pos[rowCount], letterCount[rowCount]);
-                            */
                             
                             if (row_count - lb_rows == 0) {
                                 lb_rows -= 1; 
@@ -413,15 +362,6 @@ int main(void)
 
                 else if (mode == 1) 
                 {    
-                    
-                    /*char temp[letterCount[rowCount] + 1 - cur_pos[rowCount]];
-                    memcpy(temp, name[rowCount] + cur_pos[rowCount], letterCount[rowCount] + 1 - cur_pos[rowCount]);
-                    name[rowCount][cur_pos[rowCount]] = '\0';
-                    letterCount[rowCount] = cur_pos[rowCount];
-                    //fprintf(stderr, "|%s|\n|%s|\n", name[rowCount], temp); 
-                    rowCount++;
-                    */
-                    
                     char *temp = malloc (sizeof(char) * (cur_line->char_count + 1 - cur_line->cursor_pos));
                     memcpy(temp, cur_line->line_data + cur_line->cursor_pos, (cur_line->char_count + 1 - cur_line->cursor_pos));
                     int temp_size = (cur_line->char_count + 1 - cur_line->cursor_pos);
@@ -458,31 +398,12 @@ int main(void)
                     //abc4
                     //
                     //0123
-                    /*
-                       if (letterCoun[rowCount] > 0) {
-                       char temp2[letterCount[rowCount]];
-                       memcpy(temp2, name[rowCount], letterCount[rowCount] + 1);
-                       memcpy(name[rowCount], temp, sizeof(temp));
-                       memcpy(name[rowCount] + sizeof(temp) - 1, temp2, sizeof(temp2));
-                       letterCount[rowCount] += sizeof(temp) - 1;
-                       cur_pos[rowCount] = 0;
-                       }
-
-                       else if (letterCount[rowCount] == 0) {
-                       memcpy(name[rowCount], temp, sizeof(temp));
-                       letterCount[rowCount] += sizeof(temp) - 1;
-                       cur_pos[rowCount] = 0;
-                       }
-                    */
                 }
             }
         }
         else SetMouseCursor(MOUSE_CURSOR_DEFAULT);
 
         framesCounter++;
-        //else framesCounter = 0;
-        //----------------------------------------------------------------------------------
-
         // Draw
         //----------------------------------------------------------------------------------
         BeginDrawing();
@@ -512,13 +433,10 @@ int main(void)
                 if ((cur_line->char_count < INPUT_CHARS_CAPACITY) && (row_count < ROWS_CAPACITY))
                 {
                     // Draw blinking underscore char
-                    //float cursorWidth = (MeasureTextEx(pref, name[rowCount], (mult_fact * TEXT_SIZE), TEXT_SPACING).x) / letterCount[rowCount];
-                    //fprintf(stdout, "%f\n", cursorWidth);
-                    //float x = MeasureTextEx(pref, name[rowCount], (mult_fact * TEXT_SIZE), TEXT_SPACING).x;
+                  
                     if (((framesCounter / 20) % 1) == 0) DrawTextEx(pref, "_", (Vector2) {(int)textBox.x + 5 + ((float)(mult_fact * TEXT_SIZE) / 2) * ((mode == 0) ? cur_line->char_count:cur_line->cursor_pos), (int)textBox.y + 12 + (LINE_GAP * ((lb_rows > 0) ? (row_count - lb_rows) : row_count))}, (mult_fact * TEXT_SIZE), TEXT_SPACING, BLACK);
 
                 }
-                //else DrawText("Press BACKSPACE to delete chars...", 2, 460, 20, GRAY);
             }
 
         EndDrawing();
