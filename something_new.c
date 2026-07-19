@@ -51,19 +51,6 @@ Line *make_line() {
     return new_line;
 }
 
-/*void on_stage(Line performers[], Line *lead) {
-    
-    performers[0] = lead;
-    for (int i = 1, i < MAX_ROWS, ++i) {
-        
-        if (performers[i - 1]->next != NULL) {
-            perfomers[i] = performers[i - 1]->next;
-        }
-        else performers[i] = NULL;
-    }
-}*/
-
-
 int mult_fact;
 
 //------------------------------------------------------------------------------------
@@ -121,7 +108,7 @@ int main(void)
             while (key > 0)
             {
                 // NOTE: Only allow keys in range [32..125]
-                if (((key >= 32) && (key <= 125)) && (cur_line->char_count < INPUT_CHARS_CAPACITY))
+                if (((key >= 32) && (key <= 126)) && (cur_line->char_count < INPUT_CHARS_CAPACITY))
                 {
                     //at the last position
                     if (mode == 0)
@@ -434,7 +421,7 @@ int main(void)
                 {
                     // Draw blinking underscore char
                   
-                    if (((framesCounter / 20) % 1) == 0) DrawTextEx(pref, "_", (Vector2) {(int)textBox.x + 5 + ((float)(mult_fact * TEXT_SIZE) / 2) * ((mode == 0) ? cur_line->char_count:cur_line->cursor_pos), (int)textBox.y + 12 + (LINE_GAP * ((lb_rows > 0) ? (row_count - lb_rows) : row_count))}, (mult_fact * TEXT_SIZE), TEXT_SPACING, BLACK);
+                    if (((framesCounter / 20) % 2) == 0) DrawTextEx(pref, "_", (Vector2) {(int)textBox.x + 5 + ((float)(mult_fact * TEXT_SIZE) / 2) * ((mode == 0) ? cur_line->char_count:cur_line->cursor_pos), (int)textBox.y + 12 + (LINE_GAP * ((lb_rows > 0) ? (row_count - lb_rows) : row_count))}, (mult_fact * TEXT_SIZE), TEXT_SPACING, BLACK);
 
                 }
             }
