@@ -113,6 +113,9 @@ int main(void)
                     //at the last position
                     if (mode == 0)
                     {
+                        if ((cur_line->cursor_pos - lb_chars) >= MAX_INPUT_CHARS) {
+                            lb_chars = cur_line->cursor_pos - MAX_INPUT_CHARS + 1;   //single character, so we can do this
+                        }
                         cur_line->line_data[cur_line->char_count] = (char) key;
                         cur_line->line_data[(cur_line->char_count) + 1] = '\0';
                         cur_line->char_count += 1;
@@ -121,6 +124,9 @@ int main(void)
 
                     //not at the last position
                     else if (mode == 1) {
+                        if ((cur_line->cursor_pos - lb_chars) == MAX_INPUT_CHARS) {
+                            lb_chars = cur_line->cursor_pos - MAX_INPUT_CHARS + 1;
+                        }
                         char *temp = malloc(sizeof(char) * (cur_line->char_count + 1 - cur_line->cursor_pos));
                         memcpy(temp, cur_line->line_data + cur_line->cursor_pos, cur_line->char_count + 1 - cur_line->cursor_pos);
                         cur_line->line_data[cur_line->cursor_pos] = (char) key;
@@ -138,7 +144,13 @@ int main(void)
             if (IsKeyPressed(KEY_BACKSPACE))
             { 
                 if (mode == 0) {
+                    
+               
                     if (cur_line->char_count > 0) {
+                        if ((lb_chars > 0) && (cur_line->cursor_pos - lb_chars == 0)) {
+                            lb_chars -= 1;
+                        }
+                        
                         cur_line->char_count -= 1;
                         cur_line->line_data[cur_line->char_count] = '\0';
                     }
@@ -147,6 +159,11 @@ int main(void)
                     else if (cur_line->char_count == 0) {
                        
                         if (row_count > 0) {
+                           
+                            if (cur_line->prev->char_count >= MAX_INPUT_CHARS) {
+                                lb_chars = cur_line->prev->char_count - MAX_INPUT_CHARS + 1;
+                            }
+
                             if ((lb_rows > 0) && (row_count - lb_rows == 0)) {
                                 lb_rows -= 1;
                                 top = top->prev;
@@ -170,6 +187,11 @@ int main(void)
                 
                 else if (mode == 1) {
                     if (cur_line->cursor_pos > 0) {
+
+                        if (cur_line->cursor_pos - lb_chars == 0) {
+                            lb_chars -= 1;
+                        }
+
                         char *temp = malloc (sizeof(char) * (cur_line->char_count + 1 - cur_line->cursor_pos));
                         memcpy(temp, cur_line->line_data + cur_line->cursor_pos, cur_line->char_count + 1 - cur_line->cursor_pos);
                         cur_line->cursor_pos -= 1;
@@ -208,7 +230,10 @@ int main(void)
                             memcpy(cur_line->line_data + cur_line->char_count, temp, temp_size);
                             cur_line->cursor_pos = cur_line->char_count;
                             cur_line->char_count += temp_size - 1;
-                           
+                            
+                            if (cur_line->cursor_pos > MAX_INPUT_CHARS) {
+                                lb_chars = cur_line->cursor_pos - MAX_INPUT_CHARS;
+                            }
 
                             free(temp);
                         }
@@ -226,7 +251,6 @@ int main(void)
             if (IsKeyPressed(KEY_UP)) {
                 if (row_count > 0) {
                     if ((lb_rows > 0) && ((row_count - lb_rows) == 0)) {
-                        //fprintf(stderr, "bonjour! lb_rows est %d\n", lb_rows);
                         top = top->prev;
                         lb_rows -= 1;
                     }
@@ -237,9 +261,19 @@ int main(void)
                         mode = 1;
                     }
                     else if (cur_line->cursor_pos >= cur_line->prev->char_count) {
+                        
+                        if (((cur_line->prev->char_count - lb_chars) < 0) && (lb_chars > 0)) {
+                            lb_chars = ((cur_line->prev->char_count >= MAX_INPUT_CHARS) ? (cur_line->prev->char_count - MAX_INPUT_CHARS + 1) : 0);    // if that is longer than what we can display, then show the last one, else just come back to original.
+                        }
+
                         cur_line = cur_line->prev;
                         row_count--;
                         mode = 0;
+                        /* 
+                        if (cur_line->char_count >= MAX_INPUT_CHARS) {
+                            lb_chars = cur_line->char_count - MAX_INPUT_CHARS + 1;
+                        }
+                        */
                     }
                 }
                 else if (row_count == 0) {
@@ -266,6 +300,11 @@ int main(void)
                         cur_line = cur_line->next;
                         row_count += 1;
                         mode = 0;
+                        
+                        // by less than 0, what we mean is that the slider is longer than the line, i.e. your lb_chars has overpowered the line and now, u need to go back.
+                        if ((cur_line->char_count - lb_chars < 0) && (lb_chars > 0)) {
+                            lb_chars = ((cur_line->char_count > MAX_INPUT_CHARS) ? (cur_line->char_count - MAX_INPUT_CHARS + 1) : 0);
+                        }
                     }
                 }
              
@@ -277,18 +316,19 @@ int main(void)
             }
 
             if (IsKeyPressed(KEY_LEFT)) {
-                //fprintf(stderr, "Bonjour! je suis LEFT!\n");
-                
-                if (mode == 0) {
-                    
-                    //fprintf(stderr, "Bonjour! je suis LEFT et mode est 0!\n");
+   
+                if ((lb_chars > 0) && (cur_line->cursor_pos - lb_chars == 0)) {
+                    lb_chars -= 1;
+                }
 
+                if (mode == 0) {
+    
                     if (cur_line->cursor_pos == 0) {
                         cur_line->cursor_pos = 0;
                     }
+                    
                     else {
                         cur_line->cursor_pos = cur_line->char_count - 1;
-                        //fprintf(stderr, "Bonjour! je suis LEFT et mode est 0! est cur_pos has been updated to %d\n", cur_pos[rowCount]);   
                         mode = 1;
                     }
                 }
@@ -312,19 +352,26 @@ int main(void)
                 }
 
                 else if (mode == 1) {
+                    if ((cur_line->cursor_pos - lb_chars >= MAX_INPUT_CHARS)) {
+                        lb_chars = cur_line->cursor_pos + 1 - MAX_INPUT_CHARS;    
+                    }
+
                     cur_line->cursor_pos += 1;
                     
                     if (cur_line->cursor_pos == cur_line->char_count) {
                         mode = 0;
                     }
-
-
+                    
                 }
             }
 
             if (IsKeyPressed(KEY_ENTER))
             {
+                lb_chars = 0; //u hit enter and then start writing from the beginning, regardless of where u were in prev line
+                
                 if (mode == 0) {
+
+
                     row_count++;
                     Line *new_line = make_line();
                     if (cur_line->next != NULL) { 
@@ -408,7 +455,7 @@ int main(void)
 
             for (int i = lb_rows; i < (lb_rows + MAX_ROWS) && (temp != NULL); i++) {
                 
-                DrawTextEx(pref, temp->line_data + lb_chars, (Vector2) {(int)textBox.x + 5, (int)textBox.y + 8 + (LINE_GAP * (i - lb_rows))}, (mult_fact * TEXT_SIZE), TEXT_SPACING, BLACK);
+                DrawTextEx(pref, ((temp->char_count > lb_chars) ? (temp->line_data + lb_chars) : '\0'), (Vector2) {(int)textBox.x + 5, (int)textBox.y + 8 + (LINE_GAP * (i - lb_rows))}, (mult_fact * TEXT_SIZE), TEXT_SPACING, BLACK);
                 temp = temp->next;
             }
 
@@ -421,7 +468,7 @@ int main(void)
                 {
                     // Draw blinking underscore char
                   
-                    if (((framesCounter / 20) % 2) == 0) DrawTextEx(pref, "_", (Vector2) {(int)textBox.x + 5 + ((float)(mult_fact * TEXT_SIZE) / 2) * ((mode == 0) ? cur_line->char_count:cur_line->cursor_pos), (int)textBox.y + 12 + (LINE_GAP * ((lb_rows > 0) ? (row_count - lb_rows) : row_count))}, (mult_fact * TEXT_SIZE), TEXT_SPACING, BLACK);
+                    if (((framesCounter / 20) % 2) == 0) DrawTextEx(pref, "_", (Vector2) {(int)textBox.x + 5 + ((float)(mult_fact * TEXT_SIZE) / 2) * ((mode == 0) ? ((lb_chars > 0) ? (cur_line->char_count - lb_chars) : cur_line->char_count) : ((lb_chars > 0) ? (cur_line->cursor_pos - lb_chars) : cur_line->cursor_pos)), (int)textBox.y + 12 + (LINE_GAP * ((lb_rows > 0) ? (row_count - lb_rows) : row_count))}, (mult_fact * TEXT_SIZE), TEXT_SPACING, BLACK);
 
                 }
             }
