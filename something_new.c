@@ -20,8 +20,19 @@
 #define MY_COL_ONE              CLITERAL(Color){ 201, 195, 131, 245 }
 #define MY_COL_TWO              CLITERAL(Color){ 190, 185, 161, 145 }
 
+// ADD 2 BUTTONS, ONE FOR CLEARING THE PAGE, AND ONE FOR SAVING IT. THINK ABOUT HOW TO IMPLEMENT AND ALL. AND DONT FORGET THE STYLE
+
+int lb_chars;
+int lb_rows;
+
+int row_count;
+
 typedef struct Line Line;
 
+Line *top;
+Line *cur_line;
+
+int mode;
 struct Line {
     char *line_data;
     
@@ -53,6 +64,43 @@ Line *make_line() {
 
 int mult_fact;
 
+void handle_up() {
+                if (row_count > 0) {
+                    if ((lb_rows > 0) && ((row_count - lb_rows) == 0)) {
+                        top = top->prev;
+                        lb_rows -= 1;
+                    }
+                    if (cur_line->cursor_pos < cur_line->prev->char_count) {
+                        cur_line->prev->cursor_pos = cur_line->cursor_pos;
+                        cur_line = cur_line->prev;
+                        row_count -= 1;
+                        mode = 1;
+                    }
+                    else if (cur_line->cursor_pos >= cur_line->prev->char_count) {
+                        
+                        if (((cur_line->prev->char_count - lb_chars) < 0) && (lb_chars > 0)) {
+                            lb_chars = ((cur_line->prev->char_count >= MAX_INPUT_CHARS) ? (cur_line->prev->char_count - MAX_INPUT_CHARS + 1) : 0);    // if that is longer than what we can display, then show the last one, else just come back to original.
+                        }
+
+                        cur_line = cur_line->prev;
+                        row_count--;
+                        mode = 0;
+                        /* 
+                        if (cur_line->char_count >= MAX_INPUT_CHARS) {
+                            lb_chars = cur_line->char_count - MAX_INPUT_CHARS + 1;
+                        }
+                        */
+                    }
+                }
+                else if (row_count == 0) {
+                    row_count = 0;
+                }
+
+               if (IsKeyUp(KEY_UP)) {
+                    return;
+               } 
+            }
+
 //------------------------------------------------------------------------------------
 // Program main entry point
 //------------------------------------------------------------------------------------
@@ -65,24 +113,27 @@ int main(void)
     
     mult_fact = 1;
     InitWindow(screenWidth, screenHeight, "cheap text editor fow now");
-    Font pref = LoadFontEx("Fonts/Terminus.ttf", (mult_fact * TEXT_SIZE), NULL, 0);
+    Font pref   = LoadFontEx("Fonts/Terminus.ttf", (mult_fact * TEXT_SIZE), NULL, 0);
+    Font pref_b = LoadFontEx("Fonts/TerminusTTF-Bold-4.49.3.ttf", (mult_fact * TEXT_SIZE), NULL, 0);
     //printf("baseSize = %d\n", pref.baseSize);
     //printf("glyphCount = %d\n", pref.glyphCount);
     //printf("texture.id = %u\n", pref.texture.id);
     
-    int lb_rows  = 0;
-    int lb_chars = 0;
+    lb_rows  = 0;
+    lb_chars = 0;
     
 
-    int row_count    =  0;
-    Line *top       = make_line();
-    Line *cur_line  = top;
+    row_count   =  0;
+    top       = make_line();
+    cur_line  = top;
 
-    int mode = 0; 
+    mode = 0; 
     // 0 when the cur_pos and letterCount + 1 are same.
     // 1 when the cur_pos and letterCount + 1 are NOT same.
 
-    Rectangle textBox = { 0, 40, 806, 390 };
+    Rectangle typing_window = { 0, 40, 806, 390 };
+    // 390 = 8 (the top empty part, for it to look good) + 8 (bottom empty part) + 17 * (TEXT_SIZE + LINE_GAP)
+
     bool mouseOnText = true;
 
     int framesCounter = 0;
@@ -248,8 +299,8 @@ int main(void)
 
             }
             
-            if (IsKeyPressed(KEY_UP)) {
-                if (row_count > 0) {
+            if (IsKeyDown(KEY_UP)) {
+                /*if (row_count > 0) {
                     if ((lb_rows > 0) && ((row_count - lb_rows) == 0)) {
                         top = top->prev;
                         lb_rows -= 1;
@@ -269,16 +320,17 @@ int main(void)
                         cur_line = cur_line->prev;
                         row_count--;
                         mode = 0;
-                        /* 
+                         
                         if (cur_line->char_count >= MAX_INPUT_CHARS) {
                             lb_chars = cur_line->char_count - MAX_INPUT_CHARS + 1;
                         }
-                        */
+                        
                     }
                 }
                 else if (row_count == 0) {
                     row_count = 0;
-                }
+                }*/
+                handle_up();
             }
 
             if (IsKeyPressed(KEY_DOWN)) {
@@ -446,16 +498,17 @@ int main(void)
 
             DrawText("DO ANYTHING YOU WANT!", 2, 5, 20, DARKGRAY);
 
-            DrawRectangleRec(textBox, MY_COL_ONE);
-            if (mouseOnText) DrawRectangleLines((int)textBox.x, (int)textBox.y, (int)textBox.width, (int)textBox.height, RED);
-            else DrawRectangleLines((int)textBox.x, (int)textBox.y, (int)textBox.width, (int)textBox.height, DARKGRAY);
+            DrawRectangleRec(typing_window, MY_COL_ONE);
+            if (mouseOnText) DrawRectangleLines((int)typing_window.x + 1, (int)typing_window.y, (int)typing_window.width - 1, (int)typing_window.height, RED);
+            else DrawRectangleLines((int)typing_window.x, (int)typing_window.y, (int)typing_window.width, (int)typing_window.height, DARKGRAY);
 
             
             Line *temp = top;
 
             for (int i = lb_rows; i < (lb_rows + MAX_ROWS) && (temp != NULL); i++) {
                 
-                DrawTextEx(pref, ((temp->char_count > lb_chars) ? (temp->line_data + lb_chars) : '\0'), (Vector2) {(int)textBox.x + 5, (int)textBox.y + 8 + (LINE_GAP * (i - lb_rows))}, (mult_fact * TEXT_SIZE), TEXT_SPACING, BLACK);
+                DrawTextEx(pref, ((temp->char_count > lb_chars) ? (temp->line_data + lb_chars) : '\0'), (Vector2) {(int)typing_window.x + 5, (int)typing_window.y + 8 + (LINE_GAP * (i - lb_rows))}, (mult_fact * TEXT_SIZE), TEXT_SPACING, BLACK);
+                
                 temp = temp->next;
             }
 
@@ -468,7 +521,7 @@ int main(void)
                 {
                     // Draw blinking underscore char
                   
-                    if (((framesCounter / 20) % 2) == 0) DrawTextEx(pref, "_", (Vector2) {(int)textBox.x + 5 + ((float)(mult_fact * TEXT_SIZE) / 2) * ((mode == 0) ? ((lb_chars > 0) ? (cur_line->char_count - lb_chars) : cur_line->char_count) : ((lb_chars > 0) ? (cur_line->cursor_pos - lb_chars) : cur_line->cursor_pos)), (int)textBox.y + 12 + (LINE_GAP * ((lb_rows > 0) ? (row_count - lb_rows) : row_count))}, (mult_fact * TEXT_SIZE), TEXT_SPACING, BLACK);
+                    if (((framesCounter / 20) % 2) == 0) DrawTextEx(pref, "_", (Vector2) {(int)typing_window.x + 5 + ((float)(mult_fact * TEXT_SIZE) / 2) * ((mode == 0) ? ((lb_chars > 0) ? (cur_line->char_count - lb_chars) : cur_line->char_count) : ((lb_chars > 0) ? (cur_line->cursor_pos - lb_chars) : cur_line->cursor_pos)), (int)typing_window.y + 12 + (LINE_GAP * ((lb_rows > 0) ? (row_count - lb_rows) : row_count))}, (mult_fact * TEXT_SIZE), TEXT_SPACING, BLACK);
 
                 }
             }
