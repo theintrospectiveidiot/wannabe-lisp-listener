@@ -64,42 +64,6 @@ Line *make_line() {
 
 int mult_fact;
 
-void handle_up() {
-                if (row_count > 0) {
-                    if ((lb_rows > 0) && ((row_count - lb_rows) == 0)) {
-                        top = top->prev;
-                        lb_rows -= 1;
-                    }
-                    if (cur_line->cursor_pos < cur_line->prev->char_count) {
-                        cur_line->prev->cursor_pos = cur_line->cursor_pos;
-                        cur_line = cur_line->prev;
-                        row_count -= 1;
-                        mode = 1;
-                    }
-                    else if (cur_line->cursor_pos >= cur_line->prev->char_count) {
-                        
-                        if (((cur_line->prev->char_count - lb_chars) < 0) && (lb_chars > 0)) {
-                            lb_chars = ((cur_line->prev->char_count >= MAX_INPUT_CHARS) ? (cur_line->prev->char_count - MAX_INPUT_CHARS + 1) : 0);    // if that is longer than what we can display, then show the last one, else just come back to original.
-                        }
-
-                        cur_line = cur_line->prev;
-                        row_count--;
-                        mode = 0;
-                        /* 
-                        if (cur_line->char_count >= MAX_INPUT_CHARS) {
-                            lb_chars = cur_line->char_count - MAX_INPUT_CHARS + 1;
-                        }
-                        */
-                    }
-                }
-                else if (row_count == 0) {
-                    row_count = 0;
-                }
-
-               if (IsKeyUp(KEY_UP)) {
-                    return;
-               } 
-            }
 
 //------------------------------------------------------------------------------------
 // Program main entry point
@@ -300,7 +264,7 @@ int main(void)
             }
             
             if (IsKeyDown(KEY_UP)) {
-                /*if (row_count > 0) {
+                if (row_count > 0) {
                     if ((lb_rows > 0) && ((row_count - lb_rows) == 0)) {
                         top = top->prev;
                         lb_rows -= 1;
@@ -329,8 +293,7 @@ int main(void)
                 }
                 else if (row_count == 0) {
                     row_count = 0;
-                }*/
-                handle_up();
+                }
             }
 
             if (IsKeyPressed(KEY_DOWN)) {
