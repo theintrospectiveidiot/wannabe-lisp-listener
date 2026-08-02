@@ -11,7 +11,7 @@
 // cuz the main aim of this isnt a good text editor, its a basic text editor with hopefully something cool!
 
 #define MAX_INPUT_CHARS         79
-#define MAX_ROWS                17
+#define MAX_ROWS                9
 
 #define TEXT_SIZE               20
 #define LINE_GAP                (TEXT_SIZE + 2)
@@ -64,6 +64,16 @@ Line *make_line() {
 
 int mult_fact;
 
+/*
+select_text() {
+    mouse_pos.x, mouse_pos.y
+    mouse_pos.x - typing_window.x;
+    mouse_pos.y - typing_winDrawLineEx(Vector2 startPos, Vector2 endPos, float thick, Color color);dow.y;
+
+    *HIGHLIGHT THE TEXT, AND GIVE THEM A DIFFERENT COLOUR!*
+} 
+*/
+
 //------------------------------------------------------------------------------------
 // Program main entry point
 //------------------------------------------------------------------------------------
@@ -71,8 +81,8 @@ int main(void)
 {
     // Initialization
     //--------------------------------------------------------------------------------------
-    const int screenWidth  = 806;
-    const int screenHeight = 500;
+    const int screenWidth  = 810;
+    const int screenHeight = 600;
     
     mult_fact = 1;
     InitWindow(screenWidth, screenHeight, "cheap text editor fow now");
@@ -86,16 +96,16 @@ int main(void)
     lb_chars = 0;
     
 
-    row_count   =  0;
+    row_count =  0;
     top       = make_line();
     cur_line  = top;
 
     mode = 0; 
     // 0 when the cur_pos and letterCount + 1 are same.
     // 1 when the cur_pos and letterCount + 1 are NOT same.
-
-    Rectangle typing_window = { 0, 40, 806, 390 };
-    // 390 = 8 (the top empty part, for it to look good) + 8 (bottom empty part) + 17 * (TEXT_SIZE + LINE_GAP)
+    Rectangle hor_divider   = { 0,      40 + 214, 810,  20 }; 
+    Rectangle repl_window   = { 0,            40, 810, 214 };
+    Rectangle typing_window = { 0, 40 + 214 + 20, 810, 214 };
 
     bool mouseOnText = true;
 
@@ -262,7 +272,7 @@ int main(void)
 
             }
             
-            if (IsKeyDown(KEY_UP)) {
+            if (IsKeyPressed(KEY_UP)) {
                 if (row_count > 0) {
                     if ((lb_rows > 0) && ((row_count - lb_rows) == 0)) {
                         top = top->prev;
@@ -460,10 +470,12 @@ int main(void)
 
             DrawText("DO ANYTHING YOU WANT!", 2, 5, 20, DARKGRAY);
 
+            DrawRectangleRec(repl_window,   MY_COL_ONE);
+            DrawRectangleRec(hor_divider,   MY_COL_TWO);
             DrawRectangleRec(typing_window, MY_COL_ONE);
-            if (mouseOnText) DrawRectangleLines((int)typing_window.x + 1, (int)typing_window.y, (int)typing_window.width - 1, (int)typing_window.height, RED);
-            else DrawRectangleLines((int)typing_window.x, (int)typing_window.y, (int)typing_window.width, (int)typing_window.height, DARKGRAY);
 
+            DrawRectangleLines((int)typing_window.x + 1, (int)typing_window.y, (int)typing_window.width - 1, (int)typing_window.height, RED);
+            DrawRectangleLines((int)repl_window.x + 1, (int)repl_window.y, (int)repl_window.width - 1, (int)repl_window.height, RED);
             
             Line *temp = top;
 
@@ -475,7 +487,10 @@ int main(void)
             }
 
 
-            DrawText(TextFormat("CURSOR POSITION: (%d, %d)", row_count, cur_line->cursor_pos), 2, 450, 20, DARKGRAY);
+            DrawText(TextFormat("CURSOR POSITION: (%d, %d)", row_count, cur_line->cursor_pos), 2, 525, 20, DARKGRAY);
+            
+            Vector2 mouse_pos = GetMousePosition();
+            DrawText(TextFormat("Mouse Position: [%f, %f]", mouse_pos.x - typing_window.x, mouse_pos.y - typing_window.y), 2, 560, 20, DARKGRAY);
 
             if (mouseOnText)
             {
@@ -487,8 +502,10 @@ int main(void)
 
                 }
             }
+            
 
-        EndDrawing();
+            
+            EndDrawing();
         //----------------------------------------------------------------------------------
     }
 
