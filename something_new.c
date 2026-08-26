@@ -5,7 +5,6 @@
 #include <stdlib.h>
 
 #define INPUT_CHARS_CAPACITY    1000
-#define ROWS_CAPACITY           8000
 
 // have hardcoded a long capacity, hoping that we dont need to worry about what happens beyond that.
 // cuz the main aim of this isnt a good text editor, its a basic text editor with hopefully something cool!
@@ -62,7 +61,28 @@ Line *make_line() {
     return new_line;
 }
 
-int mult_fact;
+
+Line *meow() {
+    Line *new = make_line();
+    new->next = make_line();
+    
+    new->next->next = make_line();
+    free(new->next->next->line_data);
+    new->next->next->line_data = strdup ("     /\\___/\\");
+    new->next->next->char_count = strlen(new->next->next->line_data); 
+
+    new->next->next->next = make_line();
+    free(new->next->next->next->line_data);
+    new->next->next->next->line_data = strdup ("    ( 0 w 0 )       - This is supposed to be the REPL!");
+    new->next->next->next->char_count = strlen(new->next->next->next->line_data); 
+    
+    new->next->next->next->next = make_line();
+    free(new->next->next->next->next->line_data);
+    new->next->next->next->next->line_data = strdup ("     (_____)~~");
+    new->next->next->next->next->char_count = strlen(new->next->next->next->next->line_data); 
+
+    return new;
+}
 
 /*
 select_text() {
@@ -73,6 +93,8 @@ select_text() {
     *HIGHLIGHT THE TEXT, AND GIVE THEM A DIFFERENT COLOUR!*
 } 
 */
+
+int mult_fact;
 
 //------------------------------------------------------------------------------------
 // Program main entry point
@@ -362,7 +384,7 @@ int main(void)
                     if (cur_line->cursor_pos == 0) {
                         cur_line->cursor_pos = 0;
                     }
-                    
+                   // hello 
                     else {
                         cur_line->cursor_pos -= 1;
                     }
@@ -476,16 +498,23 @@ int main(void)
 
             DrawRectangleLines((int)typing_window.x + 1, (int)typing_window.y, (int)typing_window.width - 1, (int)typing_window.height, RED);
             DrawRectangleLines((int)repl_window.x + 1, (int)repl_window.y, (int)repl_window.width - 1, (int)repl_window.height, RED);
+           
+            Line *meow_text = meow();
+            for (int i = 0; (i < MAX_ROWS) && (meow_text != NULL); i++) {
+                
+                DrawTextEx(pref, meow_text->line_data, (Vector2) {(int)repl_window.x + 5, (int)repl_window.y + 8 + (LINE_GAP * i)}, (mult_fact * TEXT_SIZE), TEXT_SPACING, BLACK);
+                
+                meow_text = meow_text->next;
+            }
             
             Line *temp = top;
-
+            
             for (int i = lb_rows; i < (lb_rows + MAX_ROWS) && (temp != NULL); i++) {
                 
                 DrawTextEx(pref, ((temp->char_count > lb_chars) ? (temp->line_data + lb_chars) : '\0'), (Vector2) {(int)typing_window.x + 5, (int)typing_window.y + 8 + (LINE_GAP * (i - lb_rows))}, (mult_fact * TEXT_SIZE), TEXT_SPACING, BLACK);
                 
                 temp = temp->next;
             }
-
 
             DrawText(TextFormat("CURSOR POSITION: (%d, %d)", row_count, cur_line->cursor_pos), 2, 525, 20, DARKGRAY);
             
@@ -494,7 +523,7 @@ int main(void)
 
             if (mouseOnText)
             {
-                if ((cur_line->char_count < INPUT_CHARS_CAPACITY) && (row_count < ROWS_CAPACITY))
+                if (cur_line->char_count < INPUT_CHARS_CAPACITY) 
                 {
                     // Draw blinking underscore char
                   
@@ -517,14 +546,3 @@ int main(void)
     return 0;
 }
 
-// Check if any key is pressed
-// NOTE: We limit keys check to keys between 32 (KEY_SPACE) and 126
-bool IsAnyKeyPressed()
-{
-    bool keyPressed = false;
-    int key = GetKeyPressed();
-
-    if ((key >= 32) && (key <= 126)) keyPressed = true;
-
-    return keyPressed;
-}
