@@ -61,7 +61,6 @@ Line *make_line() {
     return new_line;
 }
 
-
 Line *meow() {
     Line *new = make_line();
     new->next = make_line();
@@ -107,7 +106,7 @@ int main(void)
     const int screenHeight = 600;
     
     mult_fact = 1;
-    InitWindow(screenWidth, screenHeight, "cheap text editor fow now");
+    InitWindow(screenWidth, screenHeight, "cheap text editor for now");
     Font pref   = LoadFontEx("Fonts/Terminus.ttf", (mult_fact * TEXT_SIZE), NULL, 0);
     Font pref_b = LoadFontEx("Fonts/TerminusTTF-Bold-4.49.3.ttf", (mult_fact * TEXT_SIZE), NULL, 0);
     //printf("baseSize = %d\n", pref.baseSize);
