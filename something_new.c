@@ -1,6 +1,7 @@
 #include <raylib.h>
 #include <stdio.h>
 #include <time.h>
+#include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -124,6 +125,9 @@ int main(void)
     row_count =  0;
     top       = make_line();
     cur_line  = top;
+    
+    pid_t pid = getpid();
+    printf("%d\n", pid); 
 
     mode = 0; 
     // 0 when the cur_pos and letterCount + 1 are same.
@@ -135,6 +139,7 @@ int main(void)
     bool mouseOnText = true;
 
     int framesCounter = 0;
+    Line *meow_text_i = meow();
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
 
@@ -502,10 +507,9 @@ int main(void)
 
             DrawRectangleLines((int)typing_window.x + 1, (int)typing_window.y, (int)typing_window.width - 1, (int)typing_window.height, RED);
             DrawRectangleLines((int)repl_window.x + 1, (int)repl_window.y, (int)repl_window.width - 1, (int)repl_window.height, RED);
-           
-            Line *meow_text = meow();
+            
+            Line *meow_text = meow_text_i;
             for (int i = 0; (i < MAX_ROWS) && (meow_text != NULL); i++) {
-                
                 DrawTextEx(pref, meow_text->line_data, (Vector2) {(int)repl_window.x + 5, (int)repl_window.y + 8 + (LINE_GAP * i)}, (mult_fact * TEXT_SIZE), TEXT_SPACING, BLACK);
                 
                 meow_text = meow_text->next;
