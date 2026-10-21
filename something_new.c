@@ -93,6 +93,10 @@ select_text() {
 } 
 */
 
+bool is_key_really_pressed(int key) {
+    return IsKeyPressed(key) || IsKeyPressedRepeat(key);
+}
+
 int mult_fact;
 
 //------------------------------------------------------------------------------------
@@ -186,7 +190,7 @@ int main(void)
                 key = GetCharPressed();  // Check next character in the queue
             }
             
-            if (IsKeyPressed(KEY_BACKSPACE))
+            if (is_key_really_pressed(KEY_BACKSPACE))
             { 
                 if (mode == 0) {
                     
@@ -293,7 +297,7 @@ int main(void)
 
             }
             
-            if (IsKeyPressed(KEY_UP)) {
+            if (is_key_really_pressed(KEY_UP)) {
                 if (row_count > 0) {
                     if ((lb_rows > 0) && ((row_count - lb_rows) == 0)) {
                         top = top->prev;
@@ -326,7 +330,7 @@ int main(void)
                 }
             }
 
-            if (IsKeyPressed(KEY_DOWN)) {
+            if (is_key_really_pressed(KEY_DOWN)) {
                 
                 if (cur_line->next != NULL) {
                     if ((row_count + 1 - lb_rows) >= MAX_ROWS) {
@@ -360,7 +364,7 @@ int main(void)
                 }
             }
 
-            if (IsKeyPressed(KEY_LEFT)) {
+            if (is_key_really_pressed(KEY_LEFT)) {
    
                 if ((lb_chars > 0) && (cur_line->cursor_pos - lb_chars == 0)) {
                     lb_chars -= 1;
@@ -390,7 +394,8 @@ int main(void)
                 }
             }
 
-            if (IsKeyPressed(KEY_RIGHT)) {
+           
+            if (is_key_really_pressed(KEY_RIGHT)) {
                 if (mode == 0) {
                     //area we havent explored yet
                     cur_line->cursor_pos = cur_line->char_count;
@@ -410,7 +415,7 @@ int main(void)
                 }
             }
 
-            if (IsKeyPressed(KEY_ENTER))
+            if (is_key_really_pressed(KEY_ENTER))
             {
                 lb_chars = 0; //u hit enter and then start writing from the beginning, regardless of where u were in prev line
                 
