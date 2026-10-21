@@ -8,7 +8,7 @@ here's a screenshot:
 
 ## P. S. 
 
-if u wanna try it yourself, which u obviously do (for the basic typing and all, u know to feel whats it like to write on potentially the world's best LISP Listener), then u can go ahead and download the [statically linked executable](https://github.com/theintrospectiveidiot/wannabe-lisp-listener/blob/master/edi.tar), it doesn't require dynamic raylib linking, but do need x11 and some more things...
+if u wanna try it yourself, which u obviously do (for the basic typing and all, u know to feel whats it like to write on potentially the world's best LISP Listener), then u can go ahead and download the [statically linked executable](https://github.com/theintrospectiveidiot/wannabe-lisp-listener/blob/master/edi.tar), it doesn't require dynamic raylib linking, but u do need x11 and some more things...
 
 here's the stuff u need (and raylib isnt one of them, yay!):
 
